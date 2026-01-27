@@ -84,9 +84,9 @@ class StudentController extends Controller
         $import = new StudentsImport();
         Excel::import($import, $request->file('file'));
 
-        return back()->with([
-            'success' => 'Import completed',
-            'failures' => $import->failures()
+        return back()->with('summary', [
+            'inserted' => $import->inserted,
+            'updated' => $import->updated,
         ]);
     }
 

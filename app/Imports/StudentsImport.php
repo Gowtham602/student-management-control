@@ -19,13 +19,19 @@ class StudentsImport implements
 {
     use SkipsFailures;
 
+    public int $inserted = 0;
+    public int $updated  = 0;
+
     public function model(array $row)
     {
-        $row = array_change_key_case($row, CASE_LOWER);
+        $row = array_map('trim', array_change_key_case($row, CASE_LOWER));
 
-        return Student::updateOrCreate(
-            ['rollnum' => $row['rollnum']],
-            [
+        $student = Student::where('rollnum', $row['rollnum'])->first();
+
+        // UPDATE
+        if ($student) {
+
+            $student->update([
                 'name'          => $row['name'],
                 'email'         => $row['email'],
                 'gender'        => $row['gender'],
@@ -36,24 +42,54 @@ class StudentsImport implements
                 'section'       => $row['section'],
                 'academic_year' => $row['academic_year'],
                 'passout_year'  => $row['passout_year'],
-            ]
-        );
+            ]);
+
+            $this->updated++;
+            return null;
+        }
+
+        // INSERT
+        Student::create([
+            'rollnum'        => $row['rollnum'],
+            'name'           => $row['name'],
+            'email'          => $row['email'],
+            'gender'         => $row['gender'],
+            'phone'          => $row['phone'],
+            'blood_group'    => $row['blood_group'] ?? null,
+            'father_phone'   => $row['father_phone'],
+            'department'    => $row['department'],
+            'section'       => $row['section'],
+            'academic_year' => $row['academic_year'],
+            'passout_year'  => $row['passout_year'],
+        ]);
+
+        $this->inserted++;
+
+        return null;
     }
 
     public function rules(): array
     {
         return [
-            '*.name'          => 'required|min:3',
-            '*.email'         => 'required|email|unique:students,email',
-            '*.gender'        => 'required|in:male,female,other',
-            '*.rollnum'       => 'required|unique:students,rollnum',
-            '*.phone'         => 'required|digits:10',
-            '*.father_phone'  => 'required|digits:10',
-            '*.department'    => 'required',
-            '*.section'       => 'required',
+            '*.name' => 'required|min:3',
+
+            '*.email' => 'required|email|unique:students,email',
+
+            '*.gender' => 'required|in:male,female,other',
+
+            '*.rollnum' => 'required|unique:students,rollnum',
+
+            '*.phone' => 'required|digits:10',
+
+            '*.father_phone' => 'required|digits:10',
+
+            '*.department' => 'required',
+
+            '*.section' => 'required',
+
             '*.academic_year' => 'required|integer|between:2000,2100',
-            '*.passout_year'  => 'required|integer|between:2000,2100',
+
+            '*.passout_year' => 'required|integer|between:2000,2100',
         ];
     }
 }
-
