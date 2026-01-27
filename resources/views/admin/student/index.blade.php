@@ -12,6 +12,12 @@
             Students List
         </h2>
 
+         <a href="{{ route('admin.students.import.form') }}"
+            class="inline-flex items-center gap-2 px-4 py-2
+                  bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+            Upload csv File
+        </a>
+
         <a href="{{ route('admin.students.create') }}"
             class="inline-flex items-center gap-2 px-4 py-2
                   bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">

@@ -1,11 +1,16 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
+use App\Imports\StudentsImport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoresStudentRequest;
 use App\Http\Requests\UpdatedStudentRequest;
 use App\Models\Student;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Request; 
+
+
 
 
 
@@ -63,6 +68,27 @@ class StudentController extends Controller
     }
 
 
+
+
+    //excel upload 
+    public function excel(){
+        return view('admin.student.excel');
+    }
+
+ public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|file|mimes:csv,txt'
+    ]);
+
+    $import = new StudentsImport();
+    Excel::import($import, $request->file('file'));
+
+    return back()->with([
+        'success'  => 'Import completed',
+        'failures' => $import->failures()
+    ]);
+}
 
 
 }
