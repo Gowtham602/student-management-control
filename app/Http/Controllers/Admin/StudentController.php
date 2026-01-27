@@ -75,20 +75,21 @@ class StudentController extends Controller
         return view('admin.student.excel');
     }
 
- public function import(Request $request)
-{
-    $request->validate([
-        'file' => 'required|file|mimes:csv,txt'
-    ]);
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:csv,xlsx'
+        ]);
 
-    $import = new StudentsImport();
-    Excel::import($import, $request->file('file'));
+        $import = new StudentsImport();
+        Excel::import($import, $request->file('file'));
 
-    return back()->with([
-        'success'  => 'Import completed',
-        'failures' => $import->failures()
-    ]);
-}
+        return back()->with([
+            'success' => 'Import completed',
+            'failures' => $import->failures()
+        ]);
+    }
+
 
 
 }

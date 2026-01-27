@@ -30,6 +30,8 @@
         <table class="min-w-full text-sm">
             <thead class="bg-gray-50 text-gray-600">
                 <tr>
+                    <th class="px-6 py-3 text-left">S No</th>
+                    <th class="px-6 py-3 text-left">Roll Number</th>
                     <th class="px-6 py-3 text-left">Name</th>
                     <th class="px-6 py-3 text-left">Email</th>
                     <th class="px-6 py-3 text-left">Department</th>
@@ -41,6 +43,13 @@
             <tbody class="divide-y">
                 @foreach($students as $student)
                 <tr id="student-row-{{ $student->id }}" class="hover:bg-gray-50">
+
+                  <td class="px-6 py-4 font-medium text-gray-800">
+                        {{ $loop->iteration }}
+                    </td>
+                     <td class="px-6 py-4 font-medium text-gray-800">
+                        {{ $student->rollnum }}
+                    </td>
                     <td class="px-6 py-4 font-medium text-gray-800">
                         {{ $student->name }}
                     </td>

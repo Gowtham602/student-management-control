@@ -3,7 +3,6 @@
 namespace App\Imports;
 
 use App\Models\Student;
-use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\{
     ToModel,
     WithHeadingRow,
@@ -20,17 +19,16 @@ class StudentsImport implements
 {
     use SkipsFailures;
 
-    /**
-     * INSERT / UPDATE LOGIC
-     */
     public function model(array $row)
     {
+        $row = array_change_key_case($row, CASE_LOWER);
+
         return Student::updateOrCreate(
-            ['email' => $row['email']], // UNIQUE KEY
+            ['rollnum' => $row['rollnum']],
             [
                 'name'          => $row['name'],
+                'email'         => $row['email'],
                 'gender'        => $row['gender'],
-                'rollnum'       => $row['rollnum'],
                 'phone'         => $row['phone'],
                 'blood_group'   => $row['blood_group'] ?? null,
                 'father_phone'  => $row['father_phone'],
@@ -42,22 +40,20 @@ class StudentsImport implements
         );
     }
 
-    /**
-     * ROW VALIDATION (NO *)
-     */
     public function rules(): array
     {
         return [
-            'name'          => 'required|min:3',
-            'email'         => 'required|email',
-            'gender'        => 'required|in:male,female,other',
-            'rollnum'       => 'required',
-            'phone'         => 'required|digits:10',
-            'father_phone'  => 'required|digits:10',
-            'department'    => 'required',
-            'section'       => 'required',
-            'academic_year' => 'required|digits:4',
-            'passout_year'  => 'required|digits:4',
+            '*.name'          => 'required|min:3',
+            '*.email'         => 'required|email|unique:students,email',
+            '*.gender'        => 'required|in:male,female,other',
+            '*.rollnum'       => 'required|unique:students,rollnum',
+            '*.phone'         => 'required|digits:10',
+            '*.father_phone'  => 'required|digits:10',
+            '*.department'    => 'required',
+            '*.section'       => 'required',
+            '*.academic_year' => 'required|integer|between:2000,2100',
+            '*.passout_year'  => 'required|integer|between:2000,2100',
         ];
     }
 }
+
