@@ -30,7 +30,7 @@
         </a>
 
         {{-- Add Student --}}
-        <a href="{{ route('admin.students.create') }}"
+        <!-- <a href="{{ route('admin.students.create') }}"
            class="flex items-center gap-3 px-3 py-2 rounded-lg
            text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">
 
@@ -41,7 +41,7 @@
             </svg>
 
             <span class="text-sm font-medium">Add Student</span>
-        </a>
+        </a> -->
 
         {{-- Students List --}}
         <a href="{{ route('admin.students.index') }}"
