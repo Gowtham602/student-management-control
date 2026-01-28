@@ -44,6 +44,12 @@ Route::middleware(['auth', 'role:admin'])
         ->name('students.destroy');
 
 
+    Route::get('/students/{student}', [StudentController::class, 'show'])
+        ->name('students.show');
+
+
+
+
 });
 
 Route::middleware(['auth', 'role:admin'])

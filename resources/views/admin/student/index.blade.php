@@ -72,6 +72,20 @@
                     <td class="px-6 py-4 text-right">
                         <div class="flex justify-end gap-4">
 
+                            <!-- Show info  -->
+                            <!-- Info / View -->
+                                <a href="{{ route('admin.students.show', $student->id) }}"
+                                class="flex items-center gap-1 text-emerald-600 hover:text-emerald-800 transition">
+
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13 16h-1v-4h-1m1-4h.01M12 20
+                                                a8 8 0 100-16 8 8 0 000 16z"/>
+                                    </svg>
+                                    Info
+                                </a>
+
                             <!-- Edit -->
                             <a href="{{ route('admin.students.edit', $student->id) }}"
                                class="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 transition">

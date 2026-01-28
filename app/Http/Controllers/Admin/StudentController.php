@@ -68,6 +68,13 @@ class StudentController extends Controller
     }
 
 
+    //show and info particular students 
+
+    public function show(Student $student)
+    {
+    return view('admin.student.show', compact('student'));
+    }
+
 
 
     //excel upload 
