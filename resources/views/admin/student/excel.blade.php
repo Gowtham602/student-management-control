@@ -44,12 +44,12 @@
     </div>
 
     <!-- Error Table -->
-     @if(session('summary'))
+     <!-- @if(session('summary'))
 <div class="bg-green-100 p-4 rounded mb-4">
     Inserted: {{ session('summary.inserted') }} |
     Updated: {{ session('summary.updated') }}
 </div>
-@endif
+@endif -->
 
     @if(session('failures') && count(session('failures')) > 0)
     <div class="bg-white shadow rounded-xl p-5 mt-6">
