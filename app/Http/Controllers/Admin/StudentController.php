@@ -17,10 +17,20 @@ use Illuminate\Http\Request;
 class StudentController extends Controller
 {
     // List students
-    public function index()
+    public function index(Request $request)
     {
-        $students = Student::latest()->get();
-        return view('admin.student.index', compact('students'));
+
+    $search = $request->search;
+
+    $students = Student::when($search, function ($query, $search) {
+        $query->where('name', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%")
+              ->orWhere('rollnum', 'like', "%{$search}%");
+    })
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
+        return view('admin.student.index', compact('students','search'));
     }
 
     // Show create form

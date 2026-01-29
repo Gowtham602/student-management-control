@@ -7,23 +7,49 @@
 <div class="bg-white rounded-xl border shadow-sm">
 
     <!-- Header -->
-    <div class="flex items-center justify-between p-6 border-b">
-        <h2 class="text-lg font-semibold text-gray-800">
-            Students List
-        </h2>
+<div class="flex items-center justify-between p-6 border-b gap-4">
 
-        <div class="flex gap-3">
-            <a href="{{ route('admin.students.import.form') }}"
-               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                Upload CSV
-            </a>
+    <!-- Title -->
+    <h2 class="text-lg font-semibold text-gray-800 whitespace-nowrap">
+        Students List
+    </h2>
 
-            <a href="{{ route('admin.students.create') }}"
-               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                + Add Student
-            </a>
+    <!-- Search -->
+    <form method="GET"
+          action="{{ route('admin.students.index') }}"
+          class="flex-1 max-w-md">
+        <div class="flex gap-2">
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Search name / email / roll no"
+                class="border rounded-lg px-4 py-2 w-full focus:ring focus:ring-indigo-200"
+            >
+
+            <button
+                type="submit"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                Search
+            </button>
         </div>
+    </form>
+
+    <!-- Actions -->
+    <div class="flex gap-3 whitespace-nowrap">
+        <a href="{{ route('admin.students.import.form') }}"
+           class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+            Upload CSV
+        </a>
+
+        <a href="{{ route('admin.students.create') }}"
+           class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+            + Add Student
+        </a>
     </div>
+
+</div>
+
 
     <!-- Table -->
     <div class="overflow-x-auto">
@@ -122,7 +148,18 @@
                 @endforelse
 
             </tbody>
-        </table>
+        </table>   
+            </div>  
+
+            <div class="px-6 py-4 border-t">
+                {{ $students->links() }}
+            </div>
+            <div class="text-sm text-gray-500 px-6 py-2">
+                <!-- Total: {{ $students->total() }}, -->
+                Page: {{ $students->currentPage() }}
+            </div>
+
+            </div>
     </div>
 </div>
 
