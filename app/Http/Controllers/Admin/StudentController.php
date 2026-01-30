@@ -15,38 +15,81 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class StudentController extends Controller
 {
+
     // List students
 
 
-    public function index(Request $request)
-    {
-        $students = Student::query()
+    // public function index(Request $request)
+    // {
+    //     $students = Student::query()
 
-            // SEARCH
-            ->when($request->search, function ($q) use ($request) {
-                $q->where(function ($sub) use ($request) {
-                    $sub->where('name', 'like', "%{$request->search}%")
-                        ->orWhere('email', 'like', "%{$request->search}%")
-                        ->orWhere('rollnum', 'like', "%{$request->search}%");
-                });
-            })
+    //         // SEARCH
+    //         ->when($request->search, function ($q) use ($request) {
+    //             $q->where(function ($sub) use ($request) {
+    //                 $sub->where('name', 'like', "%{$request->search}%")
+    //                     ->orWhere('email', 'like', "%{$request->search}%")
+    //                     ->orWhere('rollnum', 'like', "%{$request->search}%");
+    //             });
+    //         })
 
-            // FILTER: DEPARTMENT
-            ->when($request->department, function ($q) use ($request) {
-                $q->where('department', $request->department);
-            })
+    //         // FILTER: DEPARTMENT
+    //         ->when($request->department, function ($q) use ($request) {
+    //             $q->where('department', $request->department);
+    //         })
 
-            // FILTER: SECTION
-            ->when($request->section, function ($q) use ($request) {
-                $q->where('section', $request->section);
-            })
+    //         // FILTER: SECTION
+    //         ->when($request->section, function ($q) use ($request) {
+    //             $q->where('section', $request->section);
+    //         })
 
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+    //         ->latest()
+    //         ->paginate(10)
+    //         ->withQueryString();
 
-        return view('admin.student.index', compact('students'));
-    }
+    //     return view('admin.student.index', compact('students'));
+    // }
+public function index(Request $request)
+{
+    $currentYear = now()->year;
+
+    $students = Student::query()
+
+        // SEARCH
+        ->when($request->search, function ($q) use ($request) {
+            $q->where(function ($sub) use ($request) {
+                $sub->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%")
+                    ->orWhere('rollnum', 'like', "%{$request->search}%");
+            });
+        })
+
+        // FILTERS
+        ->when($request->department, fn ($q) =>
+            $q->where('department', $request->department)
+        )
+
+        ->when($request->section, fn ($q) =>
+            $q->where('section', $request->section)
+        )
+
+        //  SMART YEAR ORDERING
+        ->orderByRaw("
+            CASE
+                WHEN ? < admission_year THEN 0
+                WHEN ? > passout_year THEN 5 
+                ELSE (? - admission_year) + 1
+            END ASC
+        ", [$currentYear, $currentYear, $currentYear])
+
+        ->orderBy('name')
+
+        ->paginate(10)
+        ->withQueryString();
+
+    return view('admin.student.index', compact('students'));
+}
+
+
 
     // EXPORT EXCEL
     public function exportExcel()

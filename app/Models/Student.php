@@ -27,14 +27,14 @@ class Student extends Model
         'passout_year',
     ];
 
-    // AUTO CURRENT STUDY YEAR
+    // AUTO CURRENT STUDY YEAR 
     public function getStudyYearAttribute(): string
     {
         if (!$this->admission_year || !$this->passout_year) {
             return 'N/A';
         }
 
-        $currentYear = now()->year;
+        $currentYear = now()->year;  
 
         if ($currentYear < $this->admission_year) {
             return 'Not Started';
