@@ -140,9 +140,11 @@ class StudentController extends Controller
         Excel::import($import, $request->file('file'));
 
         return back()
-            ->with('summary', [
-                'inserted' => $import->inserted,
-            ])
-            ->with('failures', $import->failures());
+    ->with('summary', [
+        'inserted' => $import->inserted,
+        'updated' => $import->updated,
+    ])
+    ->with('failures', $import->failures());
+
     }
 }
