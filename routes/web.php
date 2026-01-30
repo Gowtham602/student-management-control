@@ -21,48 +21,44 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('dashboard');
 
-    // Students CRUD
-    Route::get('/students', [StudentController::class, 'index'])
-        ->name('students.index');
+        // ======================
+        // Students
+        // ======================
 
-    Route::get('/students/create', [StudentController::class, 'createStudent'])
-        ->name('students.create');
-
-    Route::post('/students', [StudentController::class, 'store'])
-        ->name('students.store');
-
-    Route::get('/students/{student}/edit', [StudentController::class, 'edit'])
-        ->name('students.edit');
-
-    Route::put('/students/{student}', [StudentController::class, 'update'])
-        ->name('students.update');
-
-    Route::delete('/students/{student}', [StudentController::class, 'destroy'])
-        ->name('students.destroy');
-
-
-    Route::get('/students/{student}', [StudentController::class, 'show'])
-        ->name('students.show');
-
-
-
-
-});
-
-Route::middleware(['auth', 'role:admin'])
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(function () {
-
+        // IMPORT (STATIC ROUTES FIRST)
         Route::get('/students/import', [StudentController::class, 'excel'])
             ->name('students.import.form');
 
         Route::post('/students/import', [StudentController::class, 'import'])
             ->name('students.import');
-});
+
+        // CRUD
+        Route::get('/students', [StudentController::class, 'index'])
+            ->name('students.index');
+
+        Route::get('/students/create', [StudentController::class, 'createStudent'])
+            ->name('students.create');
+
+        Route::post('/students', [StudentController::class, 'store'])
+            ->name('students.store');
+
+        Route::get('/students/{student}/edit', [StudentController::class, 'edit'])
+            ->name('students.edit');
+
+        Route::put('/students/{student}', [StudentController::class, 'update'])
+            ->name('students.update');
+
+        Route::delete('/students/{student}', [StudentController::class, 'destroy'])
+            ->name('students.destroy');
+
+        // SHOW (ALWAYS LAST)
+        Route::get('/students/{student}', [StudentController::class, 'show'])
+            ->name('students.show');
+    });
+
 
 Route::get('/students/template', function () {
     $headers = [
