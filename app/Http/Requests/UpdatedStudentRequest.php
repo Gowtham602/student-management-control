@@ -30,7 +30,8 @@ class UpdatedStudentRequest extends FormRequest
         'father_phone'  => 'required|digits:10',
         'department'    => 'required',
         'section'       => 'required',
-         'academic_year' =>'required',
+        'admission_year'=> 'required',
+         
         'passout_year'  =>'required',
     ];
     }

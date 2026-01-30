@@ -16,7 +16,6 @@ class StudentsExport implements FromCollection, WithHeadings
             'email',
             'department',
             'section',
-            'academic_year',
             'passout_year',
             'phone'
         )->get();
@@ -29,8 +28,7 @@ class StudentsExport implements FromCollection, WithHeadings
             'Name',
             'Email',
             'Department',
-            'Section',
-            'Academic Year',
+            'Section'
             'Passout Year',
             'Phone',
         ];

@@ -35,7 +35,7 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
                 'father_phone'   => $row['father_phone'],
                 'department'    => $row['department'],
                 'section'       => $row['section'],
-                'academic_year' => $row['academic_year'],
+                // 'academic_year' => $row['academic_year'],
                 'passout_year'  => $row['passout_year'],
             ]
         );
@@ -60,7 +60,7 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             '*.father_phone' => 'required|digits:10',
             '*.department' => 'required',
             '*.section' => 'required',
-            '*.academic_year' => 'required|integer|between:2000,2100',
+            // '*.academic_year' => 'required|integer|between:2000,2100',
             '*.passout_year' => 'required|integer|between:2000,2100',
         ];
     }

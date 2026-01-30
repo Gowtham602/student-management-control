@@ -93,7 +93,7 @@
             @error('section') <p class="error">{{ $message }}</p> @enderror
         </div>
 
-        <!-- year -->
+        <!-- year
          <div>
             <label class="label">Academic Year</label>
            <input name="academic_year" class="input" value="{{ old('academic_year') }}">
@@ -101,13 +101,46 @@
             @error('academic_year') <p class="error">{{ $message }}</p> @enderror
         </div>
 
-        <!-- passout  -->
-        <div>
+         passout  -->
+        <!-- <div>
             <label class="label">Passout Year</label>
            <input name="passout_year" class="input" value="{{ old('passout_year') }}">
 
             @error('passout_year') <p class="error">{{ $message }}</p> @enderror
-        </div>
+        </div> --> 
+        {{-- Admission Year --}}
+<div>
+    <label class="label">Admission Year</label>
+    <input type="number"
+           name="admission_year"
+           class="input"
+           placeholder=" ex:2023"
+           value="{{ old('admission_year') }}">
+    @error('admission_year') <p class="error">{{ $message }}</p> @enderror
+</div>
+
+{{-- Academic Year --}}
+<!-- <div>
+    <label class="label">Academic Year</label>
+    <input type="text"
+           name="academic_year"
+           class="input"
+           placeholder=" 2025-2026"
+           value="{{ old('academic_year') }}">
+    @error('academic_year') <p class="error">{{ $message }}</p> @enderror
+</div> -->
+
+{{-- Passout Year --}}
+<div>
+    <label class="label">Passout Year</label>
+    <input type="number"
+           name="passout_year"
+           class="input"
+           placeholder=" Ex: 2026"
+           value="{{ old('passout_year') }}">
+    @error('passout_year') <p class="error">{{ $message }}</p> @enderror
+</div>
+
 
  
         {{-- Actions --}}

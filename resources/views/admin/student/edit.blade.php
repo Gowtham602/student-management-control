@@ -111,12 +111,22 @@
         </div>
 
         {{-- Academic Year --}}
-        <div>
+        <!-- <div>
             <label class="label">Academic Year</label>
             <input name="academic_year"
                    class="input"
                    value="{{ old('academic_year', $student->academic_year) }}">
             @error('academic_year') <p class="error">{{ $message }}</p> @enderror
+        </div> -->
+
+        {{-- Admission Year--}}
+
+         <div>
+            <label class="label">Admission Year</label>
+            <input name="admission_year"
+                   class="input"
+                   value="{{ old('admission_year', $student->admission_year) }}">
+            @error('admission_year') <p class="error">{{ $message }}</p> @enderror
         </div>
 
         {{-- Passout Year --}}

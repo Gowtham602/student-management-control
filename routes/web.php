@@ -94,3 +94,51 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
+
+Route::get('/admin/students/template/csv', function () {
+
+    $headers = [
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => 'attachment; filename=students_template.csv',
+    ];
+
+    $columns = [
+        'rollnum',
+        'name',
+        'email',
+        'gender',
+        'phone',
+        'blood_group',
+        'father_phone',
+        'department',
+        'section',
+        'admission_year',
+        'passout_year',
+    ];
+
+    $rows = [
+        [101,'Arun Kumar','arun101@gmail.com','male','9876543210','B+','9876543211','CSE','A',2023,'2025-2026',2026],
+        [102,'Divya R','divya102@gmail.com','female','9876543212','O+','9876543213','CSE','B',2023,'2025-2026',2026],
+        [103,'Suresh M','suresh103@gmail.com','male','9876543214','A+','9876543215','ECE','A',2022,'2024-2025',2025],
+        [104,'Priya S','priya104@gmail.com','female','9876543216','B-','9876543217','ECE','B',2022,'2024-2025',2025],
+        [105,'Karthik V','karthik105@gmail.com','male','9876543218','O-','9876543219','MECH','A',2021,'2023-2024',2024],
+        [106,'Nisha P','nisha106@gmail.com','female','9876543220','A-','9876543221','MECH','B',2021,'2023-2024',2024],
+        [107,'Rahul T','rahul107@gmail.com','male','9876543222','B+','9876543223','CIVIL','A',2020,'2022-2023',2023],
+        [108,'Meena L','meena108@gmail.com','female','9876543224','O+','9876543225','CIVIL','B',2020,'2022-2023',2023],
+        [109,'Vikram S','vikram109@gmail.com','male','9876543226','AB+','9876543227','CSE','A',2024,'2026-2027',2027],
+        [110,'Anitha K','anitha110@gmail.com','female','9876543228','A+','9876543229','CSE','B',2024,'2026-2027',2027],
+    ];
+
+    $callback = function () use ($columns, $rows) {
+        $file = fopen('php://output', 'w');
+        fputcsv($file, $columns);
+        foreach ($rows as $row) {
+            fputcsv($file, $row);
+        }
+        fclose($file);
+    };
+
+    return response()->stream($callback, 200, $headers);
+})->name('admin.students.template.csv');

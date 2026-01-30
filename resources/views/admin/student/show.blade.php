@@ -81,10 +81,10 @@
                 <span class="font-medium">{{ $student->section }}</span>
             </div>
 
-            <div class="flex justify-between border-b py-2">
+            <!-- <div class="flex justify-between border-b py-2">
                 <span class="text-gray-500">Academic Year</span>
                 <span class="font-medium">{{ $student->academic_year }}</span>
-            </div>
+            </div> -->
 
             <div class="flex justify-between border-b py-2">
                 <span class="text-gray-500">Passout Year</span>

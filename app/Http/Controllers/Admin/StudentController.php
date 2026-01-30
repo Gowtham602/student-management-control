@@ -104,8 +104,9 @@ class StudentController extends Controller
     // Update student
     public function update(UpdatedStudentRequest $request, Student $student)
     {
+// dd("hi");
         $student->update($request->validated());
-
+    // dd($student);
         return redirect()
             ->route('admin.students.index')
             ->with('success', 'Student updated successfully');
