@@ -31,19 +31,27 @@ class Student extends Model
 
     // Auto calculate study year
     public function getStudyYearAttribute()
-    {
-        if (!$this->admission_year) {
-            return null;
-        }
-
-        $year = (now()->year - $this->admission_year) + 1;
-
-        return match (true) {
-            $year <= 1 => '1st Year',
-            $year === 2 => '2nd Year',
-            $year === 3 => '3rd Year',
-            $year === 4 => 'Final Year',
-            default => 'Passed Out',
-        };
+{
+    if (!$this->admission_year || !$this->passout_year) {
+        return null;
     }
+
+    $currentYear = now()->year;
+
+    // Passed out
+    if ($currentYear > (int)$this->passout_year) {
+        return 'Passed Out';
+    }
+
+    $year = ($currentYear - $this->admission_year) + 1;
+
+    return match ($year) {
+        1 => '1st Year',
+        2 => '2nd Year',
+        3 => '3rd Year',
+        4 => 'Final Year',
+        default => 'Passed Out',
+    };
+}
+
 }
