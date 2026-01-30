@@ -32,6 +32,18 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/students/import', [StudentController::class, 'excel'])
             ->name('students.import.form');
 
+        // EXPORT csv excel pdf 
+        Route::get('/students/export/csv', [StudentController::class, 'exportCsv'])
+            ->name('students.export.csv');
+
+        Route::get('/students/export/excel', [StudentController::class, 'exportExcel'])
+            ->name('students.export.excel');
+
+        Route::get('/students/export/pdf', [StudentController::class, 'exportPdf'])
+            ->name('students.export.pdf');
+
+
+            // bulk upload 
         Route::post('/students/import', [StudentController::class, 'import'])
             ->name('students.import');
 
@@ -39,7 +51,7 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/students', [StudentController::class, 'index'])
             ->name('students.index');
 
-        Route::get('/students/create', [StudentController::class, 'createStudent'])
+        Route::get('/students/create', [StudentController::class, 'create'])
             ->name('students.create');
 
         Route::post('/students', [StudentController::class, 'store'])

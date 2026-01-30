@@ -36,7 +36,28 @@
     </form>
 
     <!-- Actions -->
+     
+    
     <div class="flex gap-3 whitespace-nowrap">
+        
+        <!-- ACTION BUTTONS -->
+        <!-- <div class="flex gap-2 whitespace-nowrap"> -->
+            <a href="{{ route('admin.students.export.excel') }}"
+               class="bg-green-600 text-white px-3 py-2 rounded-lg">
+                Excel
+            </a>
+
+            <a href="{{ route('admin.students.export.csv') }}"
+               class="bg-blue-600 text-white px-3 py-2 rounded-lg">
+                CSV
+            </a>
+
+            <a href="{{ route('admin.students.export.pdf') }}"
+               class="bg-red-600 text-white px-3 py-2 rounded-lg">
+                PDF
+            </a>
+
+
         <a href="{{ route('admin.students.import.form') }}"
            class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
             Upload CSV
@@ -96,47 +117,47 @@
                     </td>
 
                     <td class="px-6 py-4 text-right">
-                        <div class="flex justify-end gap-4">
+    <div class="flex justify-end gap-4">
 
-                            <!-- Show info  -->
-                            <!-- Info / View -->
-                                <a href="{{ route('admin.students.show', $student->id) }}"
-                                class="flex items-center gap-1 text-emerald-600 hover:text-emerald-800 transition">
+        <!-- View / Info -->
+        <a href="{{ route('admin.students.show', $student->id) }}"
+           class="text-emerald-600 hover:text-emerald-800 transition hover:scale-110">
 
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M13 16h-1v-4h-1m1-4h.01M12 20
-                                                a8 8 0 100-16 8 8 0 000 16z"/>
-                                    </svg>
-                                    Info
-                                </a>
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M2.25 12s3.75-7.5 9.75-7.5S21.75 12 21.75 12
+                         18 19.5 12 19.5 2.25 12 2.25 12z"/>
+                <circle cx="12" cy="12" r="3.5"/>
+            </svg>
+        </a>
 
-                            <!-- Edit -->
-                            <a href="{{ route('admin.students.edit', $student->id) }}"
-                               class="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 transition">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z"/>
-                                </svg>
-                                Edit
-                            </a>
+        <!-- Edit -->
+        <a href="{{ route('admin.students.edit', $student->id) }}"
+           class="text-indigo-600 hover:text-indigo-800 transition hover:scale-110">
 
-                            <!-- Delete -->
-                            <button onclick="deleteStudent({{ $student->id }})"
-                                    class="flex items-center gap-1 text-red-600 hover:text-red-800 transition">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
-                                     viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862
-                                             a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6"/>
-                                </svg>
-                                Delete
-                            </button>
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M16.862 3.487a2.1 2.1 0 013.651 1.487
+                         L7.5 18.987 3 21l2.013-4.5L16.862 3.487z"/>
+            </svg>
+        </a>
 
-                        </div>
-                    </td>
+        <!-- Delete -->
+        <button onclick="deleteStudent({{ $student->id }})"
+           class="text-red-600 hover:text-red-800 transition hover:scale-110">
+
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>
+            </svg>
+        </button>
+
+    </div>
+</td>
+
 
                 </tr>
                 @empty
