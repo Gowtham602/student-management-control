@@ -4,86 +4,72 @@
 
 @section('content')
 
-<div class="bg-white rounded-xl border shadow-sm">
+<div class="bg-white rounded-2xl shadow border overflow-hidden">
 
-    <!-- Header -->
-<div class="flex items-center justify-between p-6 border-b gap-4">
+    <!-- Top Bar -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 border-b bg-gray-50">
 
-    <!-- Title -->
-    <h2 class="text-lg font-semibold text-gray-800 whitespace-nowrap">
-        Students List
-    </h2>
+        <div>
+            <h2 class="text-xl font-semibold text-gray-800">Students</h2>
+            <p class="text-sm text-gray-500">Manage all student records</p>
+        </div>
 
-    <!-- Search -->
-    <form method="GET"
-          action="{{ route('admin.students.index') }}"
-          class="flex-1 max-w-md">
-        <div class="flex gap-2">
+        <!-- Search -->
+        <form method="GET"
+              action="{{ route('admin.students.index') }}"
+              class="flex w-full md:w-96 gap-2">
             <input
                 type="text"
                 name="search"
                 value="{{ request('search') }}"
-                placeholder="Search name / email / roll no"
-                class="border rounded-lg px-4 py-2 w-full focus:ring focus:ring-indigo-200"
-            >
+                placeholder="Search name, email or roll no..."
+                class="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-indigo-200 focus:outline-none">
 
-            <button
-                type="submit"
-                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 rounded-lg transition">
                 Search
             </button>
-        </div>
-    </form>
+        </form>
 
-    <!-- Actions -->
-     
-    
-    <div class="flex gap-3 whitespace-nowrap">
-        
-        <!-- ACTION BUTTONS -->
-        <!-- <div class="flex gap-2 whitespace-nowrap"> -->
+        <!-- Actions -->
+        <div class="flex flex-wrap gap-2">
+
             <a href="{{ route('admin.students.export.excel') }}"
-               class="bg-green-600 text-white px-3 py-2 rounded-lg">
+               class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
                 Excel
             </a>
 
             <a href="{{ route('admin.students.export.csv') }}"
-               class="bg-blue-600 text-white px-3 py-2 rounded-lg">
+               class="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition">
                 CSV
             </a>
 
             <a href="{{ route('admin.students.export.pdf') }}"
-               class="bg-red-600 text-white px-3 py-2 rounded-lg">
+               class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition">
                 PDF
             </a>
 
+            <a href="{{ route('admin.students.import.form') }}"
+               class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition">
+                Upload
+            </a>
 
-        <a href="{{ route('admin.students.import.form') }}"
-           class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-            Upload CSV
-        </a>
-
-        <a href="{{ route('admin.students.create') }}"
-           class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-            + Add Student
-        </a>
+            <a href="{{ route('admin.students.create') }}"
+               class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium">
+                + Add Student
+            </a>
+        </div>
     </div>
-
-</div>
-
 
     <!-- Table -->
     <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
-            <thead class="bg-gray-50 text-gray-600">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
                 <tr>
-                    <th class="px-6 py-3 text-left">S.No</th>
+                    <th class="px-6 py-3 text-left">#</th>
                     <th class="px-6 py-3 text-left">Roll No</th>
-                    <th class="px-6 py-3 text-left">Name</th>
-                    <th class="px-6 py-3 text-left">Email</th>
+                    <th class="px-6 py-3 text-left">Student</th>
                     <th class="px-6 py-3 text-left">Department</th>
                     <th class="px-6 py-3 text-left">Year</th>
-
                     <th class="px-6 py-3 text-left">Phone</th>
                     <th class="px-6 py-3 text-right">Actions</th>
                 </tr>
@@ -92,37 +78,36 @@
             <tbody class="divide-y">
 
                 @forelse($students as $student)
-                <tr id="student-row-{{ $student->id }}" class="hover:bg-gray-50">
+                <tr class="hover:bg-indigo-50 transition">
 
-                    <td class="px-6 py-4 font-medium text-gray-800">
+                    <td class="px-6 py-4 font-semibold text-gray-700">
                         {{ $loop->iteration }}
                     </td>
 
                     <td class="px-6 py-4">
-                        {{ $student->rollnum }}
+                        <span class="px-2 py-1 bg-gray-100 rounded-md font-medium">
+                            {{ $student->rollnum }}
+                        </span>
                     </td>
 
-                    <td class="px-6 py-4 font-medium">
-                        {{ $student->name }}
-                    </td>
-
-                    <td class="px-6 py-4 text-gray-600">
-                        {{ $student->email }}
+                    <td class="px-6 py-4">
+                        <div class="font-semibold text-gray-800">{{ $student->name }}</div>
+                        <div class="text-xs text-gray-500">{{ $student->email }}</div>
                     </td>
 
                     <td class="px-6 py-4">
                         {{ $student->department }}
                     </td>
+
                     <td class="px-6 py-4">
                         {{ $student->study_year }}
                     </td>
-
 
                     <td class="px-6 py-4">
                         {{ $student->phone }}
                     </td>
 
-                    <td class="px-6 py-4 text-right">
+                                  <td class="px-6 py-4 text-right">
     <div class="flex justify-end gap-4">
 
         <!-- View / Info -->
@@ -164,30 +149,31 @@
     </div>
 </td>
 
-
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="text-center py-6 text-gray-500">
+                    <td colspan="7" class="py-10 text-center text-gray-500">
                         No students found
                     </td>
                 </tr>
                 @endforelse
 
             </tbody>
-        </table>   
-            </div>  
-
-            <div class="px-6 py-4 border-t">
-                {{ $students->links() }}
-            </div>
-            <div class="text-sm text-gray-500 px-6 py-2">
-                <!-- Total: {{ $students->total() }}, -->
-                Page: {{ $students->currentPage() }}
-            </div>
-
-            </div>
+        </table>
     </div>
+
+    <!-- Footer -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between px-6 py-4 border-t bg-gray-50">
+
+        <div class="text-sm text-gray-500">
+            Showing page {{ $students->currentPage() }} of {{ $students->lastPage() }}
+        </div>
+
+        <div>
+            {{ $students->links() }}
+        </div>
+    </div>
+
 </div>
 
 @push('scripts')
@@ -195,41 +181,32 @@
 function deleteStudent(id) {
 
     Swal.fire({
-        title: 'Delete student?',
-        text: 'This record will be permanently removed.',
+        title: 'Delete this student?',
+        text: 'This action cannot be undone',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#dc2626',
-        confirmButtonText: 'Delete',
-        cancelButtonText: 'Cancel'
-    }).then((result) => {
+        confirmButtonText: 'Delete'
+    }).then(result => {
 
         if (!result.isConfirmed) return;
 
         $.ajax({
             url: `/admin/students/${id}`,
             type: 'DELETE',
-            data: {
-                _token: '{{ csrf_token() }}'
-            },
+            data: {_token: '{{ csrf_token() }}'},
 
             success() {
-                $('#student-row-' + id).fadeOut(300, function () {
-                    $(this).remove();
-                });
-
                 Swal.fire({
                     toast: true,
                     position: 'top-end',
                     icon: 'success',
-                    title: 'Student deleted',
+                    title: 'Deleted successfully',
                     showConfirmButton: false,
                     timer: 2000
                 });
-            },
 
-            error() {
-                Swal.fire('Error', 'Delete failed', 'error');
+                location.reload();
             }
         });
     });
