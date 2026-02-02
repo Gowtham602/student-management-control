@@ -95,9 +95,9 @@
         {{-- Department --}}
         <div>
             <label class="label">Department</label>
-            <input name="department"
+            <input name="department_id"
                    class="input"
-                   value="{{ old('department', $student->department) }}">
+                   value="{{ $dept->id }}">{{ $dept->code }}>
             @error('department') <p class="error">{{ $message }}</p> @enderror
         </div>
 

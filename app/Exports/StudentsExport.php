@@ -14,7 +14,7 @@ class StudentsExport implements FromCollection, WithHeadings
             'rollnum',
             'name',
             'email',
-            'department',
+            'department_id',
             'section',
             'admission_year',
             'passout_year',
@@ -29,7 +29,7 @@ class StudentsExport implements FromCollection, WithHeadings
             'Name',
             'Email',
             'Department',
-            'Section',
+            'section_id',
             'Admission Year',
             'Passout Year',
 

@@ -20,8 +20,8 @@ class StoresStudentRequest extends FormRequest
             'rollnum'        => 'required|string|unique:students,rollnum',
             'phone'          => 'required|digits:10',
             'father_phone'   => 'required|digits:10',
-            'department'     => 'required|string',
-            'section'        => 'required|string',
+            'department_id' => 'required|exists:departments,id',
+            'section_id' => 'required|exists:sections,id',
 
             //  YEAR FIELDS (CORRECT)
             // 'admission_year' => 'required|integer|min:2000|max:' . now()->year,

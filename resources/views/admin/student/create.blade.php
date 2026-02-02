@@ -77,21 +77,33 @@
             @error('father_phone') <p class="error">{{ $message }}</p> @enderror
         </div>
 
-        {{-- Department --}}
-        <div>
+        {{-- Department  static--}}
+        <!-- <div>
             <label class="label">Department</label>
             <input name="department" class="input" value="{{ old('department') }}">
 
             @error('department') <p class="error">{{ $message }}</p> @enderror
-        </div>
+        </div> -->
+
+         <label class="label">Department</label>
+        <select name="department_id" id="department">
+        @foreach($departments as $dept)
+            <option value="{{ $dept->id }}">{{ $dept->code }}</option>
+        @endforeach
+        </select>
+        @error('department') <p class="error">{{ $message }}</p> @enderror
+
 
         {{-- Section --}}
-        <div>
+        <!-- <div>
             <label class="label">Section</label>
            <input name="section" class="input" value="{{ old('section') }}">
 
             @error('section') <p class="error">{{ $message }}</p> @enderror
-        </div>
+        </div> -->
+
+        <select name="section_id" id="section"></select>
+
 
         <!-- year
          <div>
@@ -171,8 +183,8 @@ $(function () {
             rollnum: { required: true },
             phone: { required: true, digits: true, minlength: 10, maxlength: 10 },
             father_phone: { required: true, digits: true, minlength: 10, maxlength: 10 },
-            department: { required: true },
-            section: { required: true },
+            department_id: { required: true },
+            section_id: { required: true },
             year:{ required: true},
             passout_year:{ required: true}
 
@@ -218,6 +230,21 @@ $(function () {
     });
 
 });
+
+// on change for department 
+$('#department').change(function () {
+    let deptId = $(this).val();
+
+    $.get('/sections/' + deptId, function (data) {
+        $('#section').empty();
+        data.forEach(section => {
+            $('#section').append(
+              `<option value="${section.id}">${section.name}</option>`
+            );
+        });
+    });
+});
+
 </script>
 @endpush
 

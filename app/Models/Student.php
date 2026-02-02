@@ -20,9 +20,9 @@ class Student extends Model
         'phone',
         'blood_group',
         'father_phone',
-        'department',
+        'department_id',
         'admission_year',
-        'semester',
+        'section_id',
         'section',
         'passout_year',
     ];
@@ -54,4 +54,16 @@ class Student extends Model
             default => 'Passed Out',
         };
     }
+
+     public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function section()
+    {
+        return $this->belongsTo(Section::class);
+    }
+
+
 }

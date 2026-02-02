@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\Admin\SectionController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +33,11 @@ Route::middleware(['auth', 'role:admin'])
         // IMPORT (STATIC ROUTES FIRST)
         Route::get('/students/import', [StudentController::class, 'excel'])
             ->name('students.import.form');
+
+        Route::get('/departments/{department}/sections',
+            [StudentController::class, 'departmentfetch']);
+
+
 
         // EXPORT csv excel pdf 
         Route::get('/students/export/csv', [StudentController::class, 'exportCsv'])
@@ -72,7 +79,22 @@ Route::middleware(['auth', 'role:admin'])
     });
 
 
-Route::get('/students/template', function () {
+
+    // department and section 
+
+    Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+    Route::resource('departments', DepartmentController::class);
+    // Route::post('departments/import', [DepartmentController::class,'import'])->name('departments.import');
+
+    Route::resource('sections', SectionController::class);
+    // Route::post('sections/import', [SectionController::class,'import'])->name('sections.import');
+});
+
+    // sample excel header templeted 
+    Route::get('/students/template', function () {
     $headers = [
         'name,email,gender,rollnum,phone,blood_group,father_phone,department,section,academic_year,passout_year'
     ];

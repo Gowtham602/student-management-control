@@ -7,6 +7,7 @@ use App\Http\Requests\StoresStudentRequest;
 use App\Http\Requests\UpdatedStudentRequest;
 use App\Imports\StudentsImport;
 use App\Models\Student;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentsExport;
@@ -115,14 +116,16 @@ public function index(Request $request)
     // Show create form
     public function create()
     {
-        return view('admin.student.create');
+
+           $departments = Department::orderBy('name')->get();
+        return view('admin.student.create',compact('departments'));
     }
 
     // Store student
     public function store(StoresStudentRequest $request)
     {
         Student::create($request->validated());
-
+        
         if ($request->ajax()) {
             return response()->json(['success' => true]);
         }
@@ -147,7 +150,7 @@ public function index(Request $request)
     // Update student
     public function update(UpdatedStudentRequest $request, Student $student)
     {
-// dd("hi");
+    // dd("hi");
         $student->update($request->validated());
     // dd($student);
         return redirect()
@@ -189,5 +192,14 @@ public function index(Request $request)
     ])
     ->with('failures', $import->failures());
 
+    }
+
+
+    // department fetch in 
+
+
+     public function departmentfetch(Department $department)
+    {
+        return $department->sections()->select('id','name')->get();
     }
 }
