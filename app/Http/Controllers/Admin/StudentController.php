@@ -69,11 +69,11 @@ public function index(Request $request)
 
         // FILTERS
         ->when($request->department, fn ($q) =>
-            $q->where('department', $request->department)
+            $q->where('department_id', $request->department)
         )
 
         ->when($request->section, fn ($q) =>
-            $q->where('section', $request->section)
+            $q->where('section_id', $request->section)
         )
 
         //  SMART YEAR ORDERING

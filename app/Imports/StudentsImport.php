@@ -1,7 +1,10 @@
 <?php
+
 namespace App\Imports;
 
 use App\Models\Student;
+use App\Models\Department;
+use App\Models\Section;
 use Throwable;
 use Maatwebsite\Excel\Concerns\{
     ToModel,
@@ -29,6 +32,22 @@ class StudentsImport implements
     {
         $row = array_map('trim', array_change_key_case($row, CASE_LOWER));
 
+        //  Find department by CODE (CSE, ECE, MECH)
+        $department = Department::where('code', $row['department'])->first();
+
+        if (!$department) {
+            return null; // skip invalid department
+        }
+
+        //  Find section under that department
+        $section = Section::where('department_id', $department->id)
+                          ->where('name', $row['section'])
+                          ->first();
+
+        if (!$section) {
+            return null; // skip invalid section
+        }
+
         $student = Student::updateOrCreate(
             ['rollnum' => $row['rollnum']],
             [
@@ -38,8 +57,11 @@ class StudentsImport implements
                 'phone'          => $row['phone'],
                 'blood_group'    => $row['blood_group'] ?? null,
                 'father_phone'   => $row['father_phone'],
-                'department'    => $row['department'],
-                'section'       => $row['section'],
+
+                //  RELATIONAL SAVE
+                'department_id'  => $department->id,
+                'section_id'     => $section->id,
+
                 'admission_year'=> $row['admission_year'],
                 'passout_year'  => $row['passout_year'],
             ]
@@ -63,14 +85,13 @@ class StudentsImport implements
             '*.father_phone' => 'required|digits:10',
             '*.department' => 'required',
             '*.section' => 'required',
-            '*.admission_year' => 'required|integer|between:2000,2100',
-            '*.passout_year' => 'required|integer|between:2000,2100',
+            '*.admission_year' => 'required|integer|between:1950,2100',
+            '*.passout_year' => 'required|integer|between:1950,2100',
         ];
     }
 
-    // Optional: customize DB error message
-    public function onError(Throwable $e)
-    {
-        // silently skip DB duplicate errors instead of crashing
-    }
+    // public function onError(Throwable $e)
+    // {
+    //     // skip bad rows silently
+    // }
 }
