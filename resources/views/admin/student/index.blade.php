@@ -69,6 +69,7 @@
                     <th class="px-6 py-3 text-left">Roll No</th>
                     <th class="px-6 py-3 text-left">Student</th>
                     <th class="px-6 py-3 text-left">Department</th>
+                    <th class="px-6 py-3 text-left">Section</th>
                     <th class="px-6 py-3 text-left">Year</th>
                     <th class="px-6 py-3 text-left">Phone</th>
                     <th class="px-6 py-3 text-right">Actions</th>
@@ -96,8 +97,13 @@
                     </td>
 
                     <td class="px-6 py-4">
-                        {{ $student->department }}
+                        {{ $student->department->code ?? '-' }}
                     </td>
+
+                    <td class="px-6 py-4">
+                        {{ $student->section->name ?? '-' }}
+                    </td>
+
 
                     <td class="px-6 py-4">
                         {{ $student->study_year }}

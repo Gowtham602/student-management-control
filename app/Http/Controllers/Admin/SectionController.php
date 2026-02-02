@@ -5,30 +5,36 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Section;
+use App\Models\Department;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\SectionImport;
 class SectionController extends Controller
 {
-    public function index()
+   public function index()
     {
-        $sections = Section::latest()->get();
-        return view('admin.sections.index', compact('sections'));
+    $sections = Section::with('department')->latest()->get();
+    return view('admin.sections.index', compact('sections'));
     }
 
     public function create()
     {
-        return view('admin.sections.create');
+    $departments = Department::orderBy('name')->get();
+    return view('admin.sections.create', compact('departments'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|max:20'
-        ]);
+    $request->validate([
+        'department_id' => 'required|exists:departments,id',
+        'name' => 'required|max:5'
+    ]);
 
-        Section::create($request->all());
+    Section::create([
+        'department_id' => $request->department_id,
+        'name' => strtoupper($request->name)
+    ]);
 
-        return redirect()->route('admin.sections.index')->with('success','Section added');
+    return redirect()->route('admin.sections.index')->with('success','Section added');
     }
 
     public function edit(Section $section)

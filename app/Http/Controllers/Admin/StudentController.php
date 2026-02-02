@@ -8,6 +8,7 @@ use App\Http\Requests\UpdatedStudentRequest;
 use App\Imports\StudentsImport;
 use App\Models\Student;
 use App\Models\Department;
+use App\Models\Section;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentsExport;
@@ -53,7 +54,9 @@ public function index(Request $request)
 {
     $currentYear = now()->year;
 
-    $students = Student::query()
+    // $students = Student::query()
+    $students = Student::with('department','section')
+
 
         // SEARCH
         ->when($request->search, function ($q) use ($request) {
@@ -142,10 +145,18 @@ public function index(Request $request)
     }
 
     // Edit form
-    public function edit(Student $student)
-    {
-        return view('admin.student.edit', compact('student'));
-    }
+   public function edit(Student $student)
+{
+    $departments = Department::orderBy('name')->get();
+
+    $sections = Section::where('department_id', $student->department_id)->get();
+
+    return view('admin.student.edit', compact(
+        'student',
+        'departments',
+        'sections'
+    ));
+}
 
     // Update student
     public function update(UpdatedStudentRequest $request, Student $student)

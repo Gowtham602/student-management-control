@@ -28,8 +28,8 @@ class UpdatedStudentRequest extends FormRequest
         'rollnum'       => 'required|unique:students,rollnum,' . $this->student->id,
         'phone'         => 'required|digits:10',
         'father_phone'  => 'required|digits:10',
-        'department'    => 'required',
-        'section'       => 'required',
+         'department_id' => 'required|exists:departments,id',
+            'section_id' => 'required|exists:sections,id',
         'admission_year'=> 'required',
          
         'passout_year'  =>'required',

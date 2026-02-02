@@ -16,8 +16,8 @@
 
     {{-- Form --}}
     <form id="studentForm" method="POST" novalidate
-          action="{{ route('admin.students.store') }}"
-          class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        action="{{ route('admin.students.store') }}"
+        class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
         @csrf
 
         {{-- Name --}}
@@ -72,7 +72,7 @@
         {{-- Father Phone --}}
         <div>
             <label class="label">Father Phone</label>
-          <input name="father_phone" class="input" value="{{ old('father_phone') }}">
+            <input name="father_phone" class="input" value="{{ old('father_phone') }}">
 
             @error('father_phone') <p class="error">{{ $message }}</p> @enderror
         </div>
@@ -84,14 +84,18 @@
 
             @error('department') <p class="error">{{ $message }}</p> @enderror
         </div> -->
-
-         <label class="label">Department</label>
-        <select name="department_id" id="department">
-        @foreach($departments as $dept)
-            <option value="{{ $dept->id }}">{{ $dept->code }}</option>
-        @endforeach
+        <div>
+        <label class="label">Department</label>
+        <select name="department_id" id="department" class="input">
+            <option value="">Select Department</option>
+            @foreach($departments as $dept)
+            <option value="{{ $dept->id }}">
+                {{ $dept->code }} — {{ $dept->name }}
+            </option>
+            @endforeach
         </select>
-        @error('department') <p class="error">{{ $message }}</p> @enderror
+        @error('department_id') <p class="error">{{ $message }}</p> @enderror
+        </div>
 
 
         {{-- Section --}}
@@ -102,7 +106,13 @@
             @error('section') <p class="error">{{ $message }}</p> @enderror
         </div> -->
 
-        <select name="section_id" id="section"></select>
+        <div>
+            <label class="label">Section</label>
+            <select name="section_id" id="section" class="input" disabled>
+                <option value="">Select Section</option>
+            </select>
+            @error('section_id') <p class="error">{{ $message }}</p> @enderror
+        </div>
 
 
         <!-- year
@@ -119,20 +129,20 @@
            <input name="passout_year" class="input" value="{{ old('passout_year') }}">
 
             @error('passout_year') <p class="error">{{ $message }}</p> @enderror
-        </div> --> 
+        </div> -->
         {{-- Admission Year --}}
-<div>
-    <label class="label">Admission Year</label>
-    <input type="number"
-           name="admission_year"
-           class="input"
-           placeholder=" ex:2023"
-           value="{{ old('admission_year') }}">
-    @error('admission_year') <p class="error">{{ $message }}</p> @enderror
-</div>
+        <div>
+            <label class="label">Admission Year</label>
+            <input type="number"
+                name="admission_year"
+                class="input"
+                placeholder=" ex:2023"
+                value="{{ old('admission_year') }}">
+            @error('admission_year') <p class="error">{{ $message }}</p> @enderror
+        </div>
 
-{{-- Academic Year --}}
-<!-- <div>
+        {{-- Academic Year --}}
+        <!-- <div>
     <label class="label">Academic Year</label>
     <input type="text"
            name="academic_year"
@@ -142,23 +152,23 @@
     @error('academic_year') <p class="error">{{ $message }}</p> @enderror
 </div> -->
 
-{{-- Passout Year --}}
-<div>
-    <label class="label">Passout Year</label>
-    <input type="number"
-           name="passout_year"
-           class="input"
-           placeholder=" Ex: 2026"
-           value="{{ old('passout_year') }}">
-    @error('passout_year') <p class="error">{{ $message }}</p> @enderror
-</div>
+        {{-- Passout Year --}}
+        <div>
+            <label class="label">Passout Year</label>
+            <input type="number"
+                name="passout_year"
+                class="input"
+                placeholder=" Ex: 2026"
+                value="{{ old('passout_year') }}">
+            @error('passout_year') <p class="error">{{ $message }}</p> @enderror
+        </div>
 
 
- 
+
         {{-- Actions --}}
         <div class="md:col-span-2 flex justify-end gap-3 pt-4 border-t">
             <a href="{{ route('admin.students.index') }}"
-               class="px-4 py-2 rounded-lg border text-gray-700 hover:bg-gray-50">
+                class="px-4 py-2 rounded-lg border text-gray-700 hover:bg-gray-50">
                 Back
             </a>
 
@@ -173,78 +183,112 @@
 </div>
 @push('scripts')
 <script>
-$(function () {
+    $(function() {
 
-    $("#studentForm").validate({
-        rules: {
-            name: { required: true, minlength: 3 },
-            email: { required: true, email: true },
-            gender: { required: true },
-            rollnum: { required: true },
-            phone: { required: true, digits: true, minlength: 10, maxlength: 10 },
-            father_phone: { required: true, digits: true, minlength: 10, maxlength: 10 },
-            department_id: { required: true },
-            section_id: { required: true },
-            year:{ required: true},
-            passout_year:{ required: true}
-
-        },
-        submitHandler: function (form) {
-
-            let formData = new FormData(form);
-
-            $.ajax({
-                url: form.action,
-                method: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (res) {
-
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'Student added successfully',
-                        showConfirmButton: false,
-                        timer: 3000
-                    });
-
-                    form.reset();
+        $("#studentForm").validate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 3
                 },
-                error: function (xhr) {
-
-                    let errors = xhr.responseJSON.errors;
-
-                    $(".error").remove();
-
-                    $.each(errors, function (key, value) {
-                        let input = $(`[name="${key}"]`);
-                        input.after(`<p class="error text-red-500 text-xs mt-1">${value[0]}</p>`);
-                    });
+                email: {
+                    required: true,
+                    email: true
+                },
+                gender: {
+                    required: true
+                },
+                rollnum: {
+                    required: true
+                },
+                phone: {
+                    required: true,
+                    digits: true,
+                    minlength: 10,
+                    maxlength: 10
+                },
+                father_phone: {
+                    required: true,
+                    digits: true,
+                    minlength: 10,
+                    maxlength: 10
+                },
+                department_id: {
+                    required: true
+                },
+                section_id: {
+                    required: true
+                },
+                year: {
+                    required: true
+                },
+                passout_year: {
+                    required: true
                 }
-            });
 
-            return false;
-        }
+            },
+            submitHandler: function(form) {
+
+                let formData = new FormData(form);
+
+                $.ajax({
+                    url: form.action,
+                    method: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Student added successfully',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+
+                        form.reset();
+                    },
+                    error: function(xhr) {
+
+                        let errors = xhr.responseJSON.errors;
+
+                        $(".error").remove();
+
+                        $.each(errors, function(key, value) {
+                            let input = $(`[name="${key}"]`);
+                            input.after(`<p class="error text-red-500 text-xs mt-1">${value[0]}</p>`);
+                        });
+                    }
+                });
+
+                return false;
+            }
+        });
+
     });
 
-});
+    // on change for department 
+    $('#department').change(function() {
+        let deptId = $(this).val();
 
-// on change for department 
-$('#department').change(function () {
-    let deptId = $(this).val();
+        $('#section').prop('disabled', true)
+            .html('<option>Loading...</option>');
 
-    $.get('/sections/' + deptId, function (data) {
-        $('#section').empty();
-        data.forEach(section => {
-            $('#section').append(
-              `<option value="${section.id}">${section.name}</option>`
-            );
+        $.get('/admin/departments/' + deptId + '/sections', function(data) {
+
+            $('#section').empty()
+                .append('<option value="">Select Section</option>')
+                .prop('disabled', false);
+
+            data.forEach(section => {
+                $('#section').append(
+                    `<option value="${section.id}">${section.name}</option>`
+                );
+            });
         });
     });
-});
-
 </script>
 @endpush
 

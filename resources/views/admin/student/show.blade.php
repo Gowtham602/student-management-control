@@ -19,7 +19,7 @@
                     {{ $student->name }}
                 </h2>
                 <p class="text-sm opacity-90">
-                    Roll No: {{ $student->rollnum }} • {{ $student->department }}
+                    Roll No: {{ $student->rollnum }} • {{ $student->department->code ?? '-' }}
                 </p>
             </div>
         </div>
@@ -73,12 +73,13 @@
 
             <div class="flex justify-between border-b py-2">
                 <span class="text-gray-500">Department</span>
-                <span class="font-medium">{{ $student->department }}</span>
+                <span class="font-medium">{{ $student->department->code ?? '-' }}</span>
             </div>
+  
 
             <div class="flex justify-between border-b py-2">
                 <span class="text-gray-500">Section</span>
-                <span class="font-medium">{{ $student->section }}</span>
+                <span class="font-medium">{{ $student->section->name ?? '- ' }}</span>
             </div>
 
             <!-- <div class="flex justify-between border-b py-2">

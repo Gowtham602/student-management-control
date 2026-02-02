@@ -94,21 +94,36 @@
 
         {{-- Department --}}
         <div>
-            <label class="label">Department</label>
-            <input name="department_id"
-                   class="input"
-                   value="{{ $dept->id }}">{{ $dept->code }}>
-            @error('department') <p class="error">{{ $message }}</p> @enderror
-        </div>
+    <label class="label">Department</label>
+
+    <select name="department_id" id="department" class="input">
+        @foreach($departments as $dept)
+            <option value="{{ $dept->id }}"
+                {{ $student->department_id == $dept->id ? 'selected' : '' }}>
+                {{ $dept->code }} - {{ $dept->name }}
+            </option>
+        @endforeach
+    </select>
+
+    @error('department_id') <p class="error">{{ $message }}</p> @enderror
+</div>
 
         {{-- Section --}}
         <div>
-            <label class="label">Section</label>
-            <input name="section"
-                   class="input"
-                   value="{{ old('section', $student->section) }}">
-            @error('section') <p class="error">{{ $message }}</p> @enderror
-        </div>
+    <label class="label">Section</label>
+
+    <select name="section_id" id="section" class="input">
+        @foreach($sections as $sec)
+            <option value="{{ $sec->id }}"
+                {{ $student->section_id == $sec->id ? 'selected' : '' }}>
+                {{ $sec->name }}
+            </option>
+        @endforeach
+    </select>
+
+    @error('section_id') <p class="error">{{ $message }}</p> @enderror
+</div>
+
 
         {{-- Academic Year --}}
         <!-- <div>
@@ -212,6 +227,25 @@ $(function () {
     });
 
 });
+
+$('#department').change(function () {
+
+    let deptId = $(this).val();
+
+    $.get('/admin/departments/' + deptId + '/sections', function (data) {
+
+        $('#section').empty();
+        $('#section').append('<option value="">Select Section</option>');
+
+        data.forEach(sec => {
+            $('#section').append(
+                `<option value="${sec.id}">${sec.name}</option>`
+            );
+        });
+
+    });
+});
+
 </script>
 @endpush
 

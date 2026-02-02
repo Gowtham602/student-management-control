@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Section extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['department_id','name'];
 
     public function students()
     {
         return $this->hasMany(Student::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 }
