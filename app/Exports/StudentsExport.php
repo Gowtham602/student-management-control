@@ -2,27 +2,34 @@
 
 namespace App\Exports;
 
-use App\Models\Student;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class StudentsExport implements FromCollection, WithHeadings
 {
+    protected Collection $students;
+
+    public function __construct(Collection $students)
+    {
+        $this->students = $students;
+    }
+
     public function collection()
     {
-        return Student::with('department','section')->get()->map(function ($student) {
+        return $this->students->map(function ($student) {
             return [
-                'rollnum'        => $student->rollnum,
-                'name'           => $student->name,
-                'email'          => $student->email,
+                $student->rollnum,
+                $student->name,
+                $student->email,
 
-                //  HUMAN READABLE
-                'department'     => $student->department->code ?? '',
-                'section'        => $student->section->name ?? '',
+                // Human readable
+                $student->department->code ?? '',
+                $student->section->name ?? '',
 
-                'admission_year'=> $student->admission_year,
-                'passout_year'  => $student->passout_year,
-                'phone'         => $student->phone,
+                $student->admission_year,
+                $student->passout_year,
+                $student->phone,
             ];
         });
     }

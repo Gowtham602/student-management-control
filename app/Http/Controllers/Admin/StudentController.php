@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoresStudentRequest;
 use App\Http\Requests\UpdatedStudentRequest;
+use App\Http\Requests;
 use App\Imports\StudentsImport;
 use App\Models\Student;
 use App\Models\Department;
@@ -115,24 +116,34 @@ class StudentController extends Controller
 
 
     // EXPORT EXCEL
-    public function exportExcel()
+    public function exportExcel(Request $request)
     {
-        return Excel::download(new StudentsExport, 'students.xlsx');
+        $students = $this->filteredStudents($request)->get();
+        return Excel::download(new StudentsExport($students), 'students.xlsx');
     }
 
     // EXPORT CSV
-    public function exportCsv()
+    public function exportCsv(Request $request)
     {
-        return Excel::download(new StudentsExport, 'students.csv');
+    $students = $this->filteredStudents($request)->get();
+
+    return Excel::download(
+        new StudentsExport($students),
+        'students.csv'
+    );
     }
 
+
     // EXPORT PDF
-    public function exportPdf()
-    {
-        $students = Student::all();
-        $pdf = Pdf::loadView('admin.student.pdf', compact('students'));
-        return $pdf->download('students.pdf');
-    }
+   public function exportPdf(Request $request)
+{
+    $students = $this->filteredStudents($request)->get();
+
+    $pdf = Pdf::loadView('admin.student.pdf', compact('students'));
+
+    return $pdf->download('students.pdf');
+}
+
 
 
     // Show create form
@@ -232,6 +243,34 @@ class StudentController extends Controller
     {
         return $department->sections()->select('id','name')->get();
     }
+
+
+
+    private function filteredStudents(Request $request)
+    {
+    return Student::with('department','section')
+
+        ->when($request->search, function ($q) use ($request) {
+            $q->where(function ($sub) use ($request) {
+                $sub->where('name','like',"%{$request->search}%")
+                    ->orWhere('email','like',"%{$request->search}%")
+                    ->orWhere('rollnum','like',"%{$request->search}%");
+            });
+        })
+
+        ->when($request->department, fn($q) =>
+            $q->where('department_id', $request->department)
+        )
+
+        ->when($request->section, fn($q) =>
+            $q->where('section_id', $request->section)
+        )
+
+        ->when($request->year, fn($q) =>
+            $q->where('admission_year', $request->year)
+        );
+    }
+
 }
 
 

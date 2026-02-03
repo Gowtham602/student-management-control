@@ -41,17 +41,17 @@
         <!-- Actions -->
         <div class="col-span-12 lg:col-span-6 flex flex-wrap gap-2 justify-start lg:justify-end">
 
-            <a href="{{ route('admin.students.export.excel') }}"
+            <a href="{{ route('admin.students.export.excel',request()->query()) }}"
                class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
                Excel
             </a>
 
-            <a href="{{ route('admin.students.export.csv') }}"
+            <a href="{{ route('admin.students.export.csv',request()->query()) }}"
                class="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition">
                CSV
             </a>
 
-            <a href="{{ route('admin.students.export.pdf') }}"
+            <a href="{{ route('admin.students.export.pdf',request()->query()) }}"
                class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition">
                PDF
             </a>
