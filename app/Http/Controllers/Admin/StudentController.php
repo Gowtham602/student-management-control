@@ -21,62 +21,35 @@ class StudentController extends Controller
     // List students
 
 
-    // public function index(Request $request)
-    // {
-    //     $students = Student::query()
-
-    //         // SEARCH
-    //         ->when($request->search, function ($q) use ($request) {
-    //             $q->where(function ($sub) use ($request) {
-    //                 $sub->where('name', 'like', "%{$request->search}%")
-    //                     ->orWhere('email', 'like', "%{$request->search}%")
-    //                     ->orWhere('rollnum', 'like', "%{$request->search}%");
-    //             });
-    //         })
-
-    //         // FILTER: DEPARTMENT
-    //         ->when($request->department, function ($q) use ($request) {
-    //             $q->where('department', $request->department);
-    //         })
-
-    //         // FILTER: SECTION
-    //         ->when($request->section, function ($q) use ($request) {
-    //             $q->where('section', $request->section);
-    //         })
-
-    //         ->latest()
-    //         ->paginate(10)
-    //         ->withQueryString();
-
-    //     return view('admin.student.index', compact('students'));
-    // }
-public function index(Request $request)
+    public function index(Request $request)
 {
     $currentYear = now()->year;
 
-    // $students = Student::query()
     $students = Student::with('department','section')
 
-
-        // SEARCH
         ->when($request->search, function ($q) use ($request) {
             $q->where(function ($sub) use ($request) {
-                $sub->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('email', 'like', "%{$request->search}%")
-                    ->orWhere('rollnum', 'like', "%{$request->search}%");
+                $sub->where('name','like',"%{$request->search}%")
+                    ->orWhere('email','like',"%{$request->search}%")
+                    ->orWhere('rollnum','like',"%{$request->search}%");
             });
         })
 
-        // FILTERS
-        ->when($request->department, fn ($q) =>
+        //  FILTER DEPARTMENT
+        ->when($request->department, fn($q) =>
             $q->where('department_id', $request->department)
         )
 
-        ->when($request->section, fn ($q) =>
+        //  FILTER SECTION
+        ->when($request->section, fn($q) =>
             $q->where('section_id', $request->section)
         )
 
-        //  SMART YEAR ORDERING
+        //  FILTER YEAR
+        ->when($request->year, fn($q) =>
+            $q->where('admission_year', $request->year)
+        )
+
         ->orderByRaw("
             CASE
                 WHEN ? < admission_year THEN 0
@@ -86,12 +59,58 @@ public function index(Request $request)
         ", [$currentYear, $currentYear, $currentYear])
 
         ->orderBy('name')
-
         ->paginate(10)
         ->withQueryString();
 
-    return view('admin.student.index', compact('students'));
+    return view('admin.student.index', [
+        'students' => $students,
+        'departments' => Department::orderBy('name')->get(),
+        'sections' => Section::orderBy('name')->get(),
+    ]);
 }
+
+// public function index(Request $request)
+// {
+//     $currentYear = now()->year;
+
+//     // $students = Student::query()
+//     $students = Student::with('department','section')
+
+
+//         // SEARCH
+//         ->when($request->search, function ($q) use ($request) {
+//             $q->where(function ($sub) use ($request) {
+//                 $sub->where('name', 'like', "%{$request->search}%")
+//                     ->orWhere('email', 'like', "%{$request->search}%")
+//                     ->orWhere('rollnum', 'like', "%{$request->search}%");
+//             });
+//         })
+
+//         // FILTERS
+//         ->when($request->department, fn ($q) =>
+//             $q->where('department_id', $request->department)
+//         )
+
+//         ->when($request->section, fn ($q) =>
+//             $q->where('section_id', $request->section)
+//         )
+
+//         //  SMART YEAR ORDERING
+//         ->orderByRaw("
+//             CASE
+//                 WHEN ? < admission_year THEN 0
+//                 WHEN ? > passout_year THEN 5 
+//                 ELSE (? - admission_year) + 1
+//             END ASC
+//         ", [$currentYear, $currentYear, $currentYear])
+
+//         ->orderBy('name')
+
+//         ->paginate(10)
+//         ->withQueryString();
+
+//     return view('admin.student.index', compact('students'));
+// }
 
 
 

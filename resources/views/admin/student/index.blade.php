@@ -7,58 +7,131 @@
 <div class="bg-white rounded-2xl shadow border overflow-hidden">
 
     <!-- Top Bar -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 border-b bg-gray-50">
+    <!-- Top Bar -->
+<div class="bg-gray-50 border-b p-6 space-y-6 rounded-2xl">
 
-        <div>
+    <!-- ROW 1 -->
+    <div class="grid grid-cols-12 gap-2 items-center">
+
+        <!-- Title -->
+        <div class="col-span-12 lg:col-span-2 space-y-1">
             <h2 class="text-xl font-semibold text-gray-800">Students</h2>
             <p class="text-sm text-gray-500">Manage all student records</p>
         </div>
 
         <!-- Search -->
-        <form method="GET"
-              action="{{ route('admin.students.index') }}"
-              class="flex w-full md:w-96 gap-2">
-            <input
-                type="text"
-                name="search"
-                value="{{ request('search') }}"
-                placeholder="Search name, email or roll no..."
-                class="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-indigo-200 focus:outline-none">
+        <div class="col-span-12 lg:col-span-4">
+            <form method="GET"
+                  action="{{ route('admin.students.index') }}"
+                  class="flex gap-2">
 
-            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 rounded-lg transition">
-                Search
-            </button>
-        </form>
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Search name, email or roll no..."
+                    class="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-indigo-200">
+
+                <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 rounded-lg transition">
+                    Search
+                </button>
+            </form>
+        </div>
 
         <!-- Actions -->
-        <div class="flex flex-wrap gap-2">
+        <div class="col-span-12 lg:col-span-6 flex flex-wrap gap-2 justify-start lg:justify-end">
 
             <a href="{{ route('admin.students.export.excel') }}"
                class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
-                Excel
+               Excel
             </a>
 
             <a href="{{ route('admin.students.export.csv') }}"
                class="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition">
-                CSV
+               CSV
             </a>
 
             <a href="{{ route('admin.students.export.pdf') }}"
                class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition">
-                PDF
+               PDF
             </a>
 
             <a href="{{ route('admin.students.import.form') }}"
                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition">
-                Upload
+               Upload
             </a>
 
             <a href="{{ route('admin.students.create') }}"
-               class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium">
-                + Add Student
+               class="px-4 py-2 bg-indigo-700 text-white rounded-lg font-medium hover:bg-indigo-800 transition">
+               + Add Student
             </a>
         </div>
+
     </div>
+
+
+
+  <!-- ROW 2 : FILTER CARD -->
+<div class="flex justify-center">
+
+    <div class="bg-white rounded-2xl shadow-sm border px-6 py-4 w-full max-w-4xl">
+
+        <form method="GET"
+              action="{{ route('admin.students.index') }}"
+              class="flex flex-wrap gap-3 justify-center items-center">
+
+            <!-- Department -->
+            <select name="department"
+                class="rounded-lg border px-4 py-2 min-w-[160px] focus:ring-2 focus:ring-indigo-200">
+
+                <option value="">All Departments</option>
+                @foreach($departments as $dept)
+                    <option value="{{ $dept->id }}"
+                        {{ request('department') == $dept->id ? 'selected' : '' }}>
+                        {{ $dept->code }}
+                    </option>
+                @endforeach
+            </select>
+
+            <!-- Section -->
+            <select name="section" id="filterSection"
+                class="rounded-lg border px-4 py-2 min-w-[140px] focus:ring-2 focus:ring-indigo-200">
+                <option value="">All Sections</option>
+            </select>
+
+            <!-- Year -->
+            <select name="year"
+                class="rounded-lg border px-4 py-2 min-w-[120px] focus:ring-2 focus:ring-indigo-200">
+
+                <option value="">All Years</option>
+                @for($y = date('Y'); $y >= 2015; $y--)
+                    <option value="{{ $y }}"
+                        {{ request('year') == $y ? 'selected' : '' }}>
+                        {{ $y }}
+                    </option>
+                @endfor
+            </select>
+
+            <!-- Buttons -->
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition shadow-sm">
+                Filter
+            </button>
+
+            <a href="{{ route('admin.students.index') }}"
+               class="px-6 py-2 border rounded-lg hover:bg-gray-100 transition">
+                Reset
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
 
     <!-- Table -->
     <div class="overflow-x-auto">
@@ -217,7 +290,32 @@ function deleteStudent(id) {
         });
     });
 }
+$('select[name="department"]').on('change', function () {
+
+    let deptId = $(this).val();
+    let sectionBox = $('#filterSection');
+
+    sectionBox.html('<option value="">Loading...</option>');
+
+    if (!deptId) {
+        sectionBox.html('<option value="">All Sections</option>');
+        return;
+    }
+
+    $.get('/admin/departments/' + deptId + '/sections', function (data) {
+
+        sectionBox.empty();
+        sectionBox.append('<option value="">All Sections</option>');
+
+        data.forEach(sec => {
+            sectionBox.append(
+                `<option value="${sec.id}">${sec.name}</option>`
+            );
+        });
+    });
+});
 </script>
+
 @endpush
 
 @endsection
