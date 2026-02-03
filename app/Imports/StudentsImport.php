@@ -90,8 +90,8 @@ class StudentsImport implements
         ];
     }
 
-    // public function onError(Throwable $e)
-    // {
-    //     // skip bad rows silently
-    // }
+    public function onError(Throwable $e)
+    {
+        // skip bad rows silently
+    }
 }

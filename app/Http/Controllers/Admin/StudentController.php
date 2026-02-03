@@ -214,3 +214,8 @@ public function index(Request $request)
         return $department->sections()->select('id','name')->get();
     }
 }
+
+
+
+
+

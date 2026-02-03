@@ -13,8 +13,8 @@
     <tr>
         <td>{{ $student->rollnum }}</td>
         <td>{{ $student->name }}</td>
-        <td>{{ $student->department }}</td>
-        <td>{{ $student->section }}</td>
+        <td>{{ $student->department->code ?? '' }}</td>
+        <td>{{ $student->section->name ?? '' }}</td>
         <td>{{ $student->phone }}</td>
     </tr>
     @endforeach

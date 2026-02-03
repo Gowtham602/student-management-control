@@ -10,16 +10,21 @@ class StudentsExport implements FromCollection, WithHeadings
 {
     public function collection()
     {
-        return Student::select(
-            'rollnum',
-            'name',
-            'email',
-            'department_id',
-            'section',
-            'admission_year',
-            'passout_year',
-            'phone'
-        )->get();
+        return Student::with('department','section')->get()->map(function ($student) {
+            return [
+                'rollnum'        => $student->rollnum,
+                'name'           => $student->name,
+                'email'          => $student->email,
+
+                //  HUMAN READABLE
+                'department'     => $student->department->code ?? '',
+                'section'        => $student->section->name ?? '',
+
+                'admission_year'=> $student->admission_year,
+                'passout_year'  => $student->passout_year,
+                'phone'         => $student->phone,
+            ];
+        });
     }
 
     public function headings(): array
@@ -29,10 +34,9 @@ class StudentsExport implements FromCollection, WithHeadings
             'Name',
             'Email',
             'Department',
-            'section_id',
+            'Section',
             'Admission Year',
             'Passout Year',
-
             'Phone',
         ];
     }
