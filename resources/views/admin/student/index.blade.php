@@ -40,21 +40,21 @@
 
             <!-- Actions -->
             <div class="col-span-12 lg:col-span-6 flex flex-wrap gap-2 justify-start lg:justify-end">
+<a href="{{ route('admin.students.export.excel', request()->query()) }}"
+   class="px-4 py-2 bg-emerald-600 text-white rounded-lg">
+    Excel
+</a>
 
-                <a href="{{ route('admin.students.export.excel',request()->query()) }}"
-                    class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
-                    Excel
-                </a>
+<a href="{{ route('admin.students.export.csv', request()->query()) }}"
+   class="px-4 py-2 bg-sky-600 text-white rounded-lg">
+    CSV
+</a>
 
-                <a href="{{ route('admin.students.export.csv',request()->query()) }}"
-                    class="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition">
-                    CSV
-                </a>
+<a href="{{ route('admin.students.export.pdf', request()->query()) }}"
+   class="px-4 py-2 bg-rose-600 text-white rounded-lg">
+    PDF
+</a>
 
-                <a href="{{ route('admin.students.export.pdf',request()->query()) }}"
-                    class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition">
-                    PDF
-                </a>
 
                 <a href="{{ route('admin.students.import.form') }}"
                     class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition">
@@ -124,9 +124,9 @@
             </select> -->
 
                     <!-- Buttons -->
-                    <!-- <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition shadow-sm">
+                    <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition shadow-sm">
                 Filter
-            </button> -->
+            </button>
 
                     <a href="{{ route('admin.students.index') }}"
                         class="px-6 py-2 border rounded-lg hover:bg-gray-100 transition">

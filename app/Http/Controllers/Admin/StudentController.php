@@ -86,6 +86,17 @@ public function index(Request $request)
 
     $students = Student::with('department','section')
 
+
+
+        
+    ->when($request->search, function ($q) use ($request) {
+        $q->where(function ($sub) use ($request) {
+            $sub->where('name','like',"%{$request->search}%")
+                ->orWhere('email','like',"%{$request->search}%")
+                ->orWhere('rollnum','like',"%{$request->search}%");
+        });
+    })
+
         ->when($request->department, fn($q) =>
             $q->where('department_id', $request->department)
         )
@@ -292,30 +303,65 @@ public function index(Request $request)
 
 
 
+    // private function filteredStudents(Request $request)
+    // {
+    // return Student::with('department','section')
+
+    //     ->when($request->search, function ($q) use ($request) {
+    //         $q->where(function ($sub) use ($request) {
+    //             $sub->where('name','like',"%{$request->search}%")
+    //                 ->orWhere('email','like',"%{$request->search}%")
+    //                 ->orWhere('rollnum','like',"%{$request->search}%");
+    //         });
+    //     })
+
+    //     ->when($request->department, fn($q) =>
+    //         $q->where('department_id', $request->department)
+    //     )
+
+    //     ->when($request->section, fn($q) =>
+    //         $q->where('section_id', $request->section)
+    //     )
+
+    //     ->when($request->year, fn($q) =>
+    //         $q->where('admission_year', $request->year)
+    //     );
+    // }
+
+
     private function filteredStudents(Request $request)
-    {
+{
+    $currentYear = now()->year;
+
     return Student::with('department','section')
 
+        // SEARCH
         ->when($request->search, function ($q) use ($request) {
             $q->where(function ($sub) use ($request) {
-                $sub->where('name','like',"%{$request->search}%")
-                    ->orWhere('email','like',"%{$request->search}%")
-                    ->orWhere('rollnum','like',"%{$request->search}%");
+                $sub->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%")
+                    ->orWhere('rollnum', 'like', "%{$request->search}%");
             });
         })
 
-        ->when($request->department, fn($q) =>
+        // DEPARTMENT
+        ->when($request->department, fn ($q) =>
             $q->where('department_id', $request->department)
         )
 
-        ->when($request->section, fn($q) =>
+        // SECTION
+        ->when($request->section, fn ($q) =>
             $q->where('section_id', $request->section)
         )
 
-        ->when($request->year, fn($q) =>
-            $q->where('admission_year', $request->year)
-        );
-    }
+        // STUDY YEAR (same as table)
+        ->when($request->year, function ($q) use ($request, $currentYear) {
+            $q->whereRaw(
+                "(? - admission_year + 1) = ?",
+                [$currentYear, $request->year]
+            );
+        });
+}
 
 }
 
