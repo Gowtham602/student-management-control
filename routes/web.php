@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\SectionController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -103,6 +104,24 @@ Route::middleware(['auth', 'role:admin'])
         echo implode("\n", $headers);
     }, 'students_template.csv');
 })->name('students.template');
+
+
+    // Attendances for student in admin 
+    Route::prefix('admin')->name('admin.')->group(function () {
+
+    Route::get('/attendance/list', [AttendanceController::class, 'index'])
+        ->name('attendance.index');
+
+    Route::post('/attendance/save', [AttendanceController::class, 'save'])
+        ->name('attendance.save');
+
+    });
+
+
+
+
+
+
 
 
 
