@@ -1,105 +1,185 @@
 @extends('layouts.admin')
-
-@section('title','Student Day Attendance')
+@section('title','Bulk Attendance')
 
 @section('content')
-<style>
-.attendance{
-    width: 45px;
-    padding: 4px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    text-align: center;
-    font-weight: 600;
-    cursor: pointer;
-}
 
-/* Colors */
-.attendance.P { background:#d1fae5; color:#065f46; }
-.attendance.A { background:#fee2e2; color:#991b1b; }
-.attendance.H { background:#fef3c7; color:#92400e; }
+<div class="space-y-6">
 
-.attendance:hover{
-    transform: scale(1.05);
-    transition:.15s;
-}
-</style>
+    <!-- FILTER CARD -->
+    <div class="bg-white rounded-2xl shadow border p-5">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+             Student Filter
+        </h2>
 
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-6 gap-4">
 
-<div class="bg-white rounded-xl shadow p-4 overflow-x-auto">
+            <!-- <input type="date" name="date" value="{{ $date }}"
+                   class="border rounded-lg px-3 py-2"> -->
 
-<table class="min-w-full border text-sm">
-    <thead class="bg-gray-100">
+            <input type="text" name="search" value="{{ request('search') }}"
+                   placeholder="Search name / roll"
+                   class="border rounded-lg px-3 py-2">
+
+            <select name="department" class="border rounded-lg px-3 py-2">
+                <option value="">All Departments</option>
+                @foreach($departments as $dept)
+                    <option value="{{ $dept->id }}" @selected(request('department')==$dept->id)>
+                        {{ $dept->name }}
+                    </option>
+                @endforeach
+            </select>
+
+            <select name="section" class="border rounded-lg px-3 py-2">
+                <option value="">All Sections</option>
+                @foreach($sections as $sec)
+                    <option value="{{ $sec->id }}" @selected(request('section')==$sec->id)>
+                        {{ $sec->name }}
+                    </option>
+                @endforeach
+            </select>
+
+            <select name="year" class="border rounded-lg px-3 py-2">
+                <option value="">All Years</option>
+                @for($i=1;$i<=4;$i++)
+                    <option value="{{ $i }}" @selected(request('year')==$i)>
+                        Year {{ $i }}
+                    </option>
+                @endfor
+            </select>
+
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2 font-medium">
+                Filter
+            </button>
+
+        </form>
+    </div>
+
+    <!-- ATTENDANCE ACTION CARD -->
+    <div class="bg-white rounded-2xl shadow border p-5">
+
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+             Mark Attendance
+        </h2>
+
+        <form method="POST" action="{{ route('admin.attendance.bulkSave') }}">
+        @csrf
+
+        <!-- ACTION BAR -->
+        <div class="flex flex-wrap items-center gap-4 mb-5 bg-gray-50 p-4 rounded-xl border">
+
+            <div>
+                <label class="text-xs text-gray-500 block">Attendance Date</label>
+                <input type="date" name="date" value="{{ $date }}"
+                       class="border rounded-lg px-3 py-2 font-semibold" required>
+            </div>
+
+            <div>
+                <label class="text-xs text-gray-500 block">Status</label>
+                <select name="status"
+                        class="border rounded-lg px-4 py-2 font-semibold">
+                    <option value="P"> Present</option>
+                    <option value="A">Absent</option>
+                    <option value="H"> Holiday</option>
+                </select>
+            </div>
+
+            <div class="mt-4 md:mt-0">
+                <button type="submit"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-semibold shadow">
+                    Save Attendance
+                </button>
+            </div>
+
+        </div>
+
+        <!-- STUDENT TABLE -->
+       <div class="overflow-x-auto rounded-xl border">
+    <table class="min-w-full text-sm">
+        <thead class="bg-gray-100 text-gray-700">
         <tr>
-            <th class="border px-3 py-2">S.No</th>
-            <th class="border px-3 py-2">Roll No</th>
-            <th class="border px-3 py-2">Student Name</th>
-
-            @for($d=1; $d<=$daysInMonth; $d++)
-                <th class="border px-2 py-2 text-center">
-                    {{ $d }}/{{ $month }}
-                </th>
-            @endfor
+            <th class="px-4 py-3 text-center">
+                <input type="checkbox" id="checkAll"
+                       class="w-4 h-4 rounded border-gray-300">
+            </th>
+            <th class="px-4 py-3">Roll No</th>
+            <th class="px-4 py-3">Name</th>
+            <th class="px-4 py-3">Year</th>
+            <th class="px-4 py-3">Department</th>
+            <th class="px-4 py-3">Section</th>
         </tr>
-    </thead>
+        </thead>
 
-    <tbody>
-        @foreach($students as $i => $student)
-        <tr>
-            <td class="border px-2 py-2">{{ $i+1 }}</td>
-            <td class="border px-2 py-2">{{ $student->roll_no }}</td>
-            <td class="border px-2 py-2">{{ $student->name }}</td>
+        <tbody class="divide-y">
+        @foreach($students as $student)
+            @php
+                $yearLevel = now()->year - $student->admission_year + 1;
+                $yearLabel = $yearLevel >= 1 && $yearLevel <= 4
+                    ? $yearLevel . ' Year'
+                    : 'Passout';
+            @endphp
 
-            @for($d=1; $d<=$daysInMonth; $d++)
-                @php
-                    $date = \Carbon\Carbon::create($year,$month,$d)->toDateString();
-                    $key = $student->id.'_'.$date;
-                    $status = $attendances[$key]->status ?? '';
-                @endphp
+            <tr class="hover:bg-indigo-50 transition">
+                <td class="px-4 py-3 text-center">
+                    <input type="checkbox"
+                           name="students[]"
+                           value="{{ $student->id }}"
+                           class="student-check w-4 h-4 rounded border-gray-300">
+                </td>
 
-              <td class="border text-center">
-    <select
-        class="attendance {{ $status }}"
-        data-student="{{ $student->id }}"
-        data-date="{{ $date }}"
-    >
-        <option value=""></option>
-        <option value="P" @selected($status=='P')>P</option>
-        <option value="A" @selected($status=='A')>A</option>
-        <option value="H" @selected($status=='H')>H</option>
-    </select>
-</td>
+                <td class="px-4 py-3 font-medium text-gray-800">
+                    {{ $student->rollnum }}
+                </td>
 
-            @endfor
-        </tr>
+                <td class="px-4 py-3 text-gray-900">
+                    {{ $student->name }}
+                </td>
+
+                <!-- YEAR BADGE -->
+                <td class="px-4 py-3">
+                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold
+                        {{ $yearLabel === 'Passout'
+                            ? 'bg-gray-200 text-gray-700'
+                            : 'bg-indigo-100 text-indigo-700' }}">
+                        <!-- Graduation Cap SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="w-4 h-4"
+                             fill="none" viewBox="0 0 24 24"
+                             stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M12 14l9-5-9-5-9 5 9 5z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M12 14v7"/>
+                        </svg>
+                        {{ $yearLabel }}
+                    </span>
+                </td>
+
+                <td class="px-4 py-3 text-gray-600">
+                    {{ $student->department->name ?? '-' }}
+                </td>
+
+                <td class="px-4 py-3 text-gray-600">
+                    {{ $student->section->name ?? '-' }}
+                </td>
+            </tr>
         @endforeach
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
+
+
+        </form>
+    </div>
 
 </div>
-@push('scripts')
-<script>
-$('.attendance').on('change', function () {
-
-    let el = $(this);
-    let status = el.val();
-
-    el.removeClass('P A H').addClass(status);
-
-    $.ajax({
-        url: "{{ route('admin.attendance.save') }}",
-        method: "POST",
-        data: {
-            _token: "{{ csrf_token() }}",
-            student_id: el.data('student'),
-            date: el.data('date'),
-            status: status
-        }
-    });
-
-});
-</script>
-
-@endpush
 
 @endsection
+
+@push('scripts')
+<script>
+document.getElementById('checkAll').addEventListener('change', function () {
+    document.querySelectorAll('.student-check')
+        .forEach(cb => cb.checked = this.checked);
+});
+</script>
+@endpush
