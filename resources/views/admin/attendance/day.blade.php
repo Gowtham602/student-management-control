@@ -6,7 +6,7 @@
 <div class="space-y-6">
 
     <!-- HEADER -->
-    <div class="flex items-center justify-between">
+    <!-- <div class="flex items-center justify-between">
         <h2 class="text-xl font-bold text-gray-800">
             Student Day Attendance
         </h2>
@@ -18,7 +18,26 @@
                 View
             </button>
         </form>
-    </div>
+    </div> -->
+    <form method="GET" class="flex items-center gap-3">
+    <!-- DATE -->
+    <input type="date" name="date" value="{{ $date }}"
+           class="border rounded-lg px-3 py-2 text-sm">
+
+    <!-- YEAR -->
+    <select name="year" class="border rounded-lg px-3 py-2 text-sm">
+        <option value="">All Years</option>
+        <option value="1" {{ request('year') == 1 ? 'selected' : '' }}>1st Year</option>
+        <option value="2" {{ request('year') == 2 ? 'selected' : '' }}>2nd Year</option>
+        <option value="3" {{ request('year') == 3 ? 'selected' : '' }}>3rd Year</option>
+        <option value="4" {{ request('year') == 4 ? 'selected' : '' }}>4th Year</option>
+    </select>
+
+    <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm">
+        View
+    </button>
+</form>
+
 
     <!-- TABLE -->
     <div class="bg-white rounded-2xl shadow border overflow-x-auto">
