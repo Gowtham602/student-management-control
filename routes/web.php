@@ -1,16 +1,16 @@
 <?php
 
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\StudentController;
-use App\Http\Controllers\Admin\DepartmentController;
-use App\Http\Controllers\Admin\AttendanceController;
-use App\Http\Controllers\Admin\SectionController;
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\{
+    DashboardController,
+    StudentController,
+    DepartmentController,
+    SectionController,
+    AttendanceController
+};
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', fn () => view('welcome'));
 
 require __DIR__.'/auth.php';
 
@@ -24,110 +24,64 @@ Route::middleware(['auth', 'role:admin'])
     ->name('admin.')
     ->group(function () {
 
-        Route::get('/dashboard', [DashboardController::class, 'index'])
-            ->name('dashboard');
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
-        // ======================
-        // Students
-        // ======================
+    /*
+    |--------------------------------------------------------------------------
+    | Students
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/students/import', [StudentController::class, 'excel'])
+        ->name('students.import.form');
 
-        // IMPORT (STATIC ROUTES FIRST)
-        Route::get('/students/import', [StudentController::class, 'excel'])
-            ->name('students.import.form');
+    Route::post('/students/import', [StudentController::class, 'import'])
+        ->name('students.import');
 
-        Route::get('/departments/{department}/sections',
-            [StudentController::class, 'departmentfetch']);
+    Route::get('/students/export/csv', [StudentController::class, 'exportCsv'])
+        ->name('students.export.csv');
 
+    Route::get('/students/export/excel', [StudentController::class, 'exportExcel'])
+        ->name('students.export.excel');
 
+    Route::get('/students/export/pdf', [StudentController::class, 'exportPdf'])
+        ->name('students.export.pdf');
 
-        // EXPORT csv excel pdf 
-        Route::get('/students/export/csv', [StudentController::class, 'exportCsv'])
-            ->name('students.export.csv');
+    Route::resource('students', StudentController::class);
 
-        Route::get('/students/export/excel', [StudentController::class, 'exportExcel'])
-            ->name('students.export.excel');
-
-        Route::get('/students/export/pdf', [StudentController::class, 'exportPdf'])
-            ->name('students.export.pdf');
-
-
-            // bulk upload 
-        Route::post('/students/import', [StudentController::class, 'import'])
-            ->name('students.import');
-
-        // CRUD
-        Route::get('/students', [StudentController::class, 'index'])
-            ->name('students.index');
-
-        Route::get('/students/create', [StudentController::class, 'create'])
-            ->name('students.create');
-
-        Route::post('/students', [StudentController::class, 'store'])
-            ->name('students.store');
-
-        Route::get('/students/{student}/edit', [StudentController::class, 'edit'])
-            ->name('students.edit');
-
-        Route::put('/students/{student}', [StudentController::class, 'update'])
-            ->name('students.update');
-
-        Route::delete('/students/{student}', [StudentController::class, 'destroy'])
-            ->name('students.destroy');
-
-        // SHOW (ALWAYS LAST)
-        Route::get('/students/{student}', [StudentController::class, 'show'])
-            ->name('students.show');
-    });
-
-
-
-    // department and section 
-
-    Route::middleware(['auth', 'role:admin'])
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | Departments & Sections
+    |--------------------------------------------------------------------------
+    */
     Route::resource('departments', DepartmentController::class);
-    // Route::post('departments/import', [DepartmentController::class,'import'])->name('departments.import');
-
     Route::resource('sections', SectionController::class);
-    // Route::post('sections/import', [SectionController::class,'import'])->name('sections.import');
-});
 
-    // sample excel header templeted 
-    Route::get('/students/template', function () {
-    $headers = [
-        'name,email,gender,rollnum,phone,blood_group,father_phone,department,section,academic_year,passout_year'
-    ];
+    Route::get('/departments/{department}/sections',
+        [StudentController::class, 'departmentfetch']);
 
-    return response()->streamDownload(function () use ($headers) {
-        echo implode("\n", $headers);
-    }, 'students_template.csv');
-})->name('students.template');
-
-
-    // Attendances for student in admin 
- Route::prefix('admin')->name('admin.')->group(function () {
-
+    /*
+    |--------------------------------------------------------------------------
+    | Attendance
+    |--------------------------------------------------------------------------
+    */
     Route::get('/attendance', [AttendanceController::class, 'index'])
         ->name('attendance.index');
 
     Route::post('/attendance/bulk-save', [AttendanceController::class, 'bulkSave'])
         ->name('attendance.bulkSave');
 
+    Route::get('/attendance/day', [AttendanceController::class, 'dayList'])
+        ->name('attendance.day');
+
+    Route::get('/attendance/summary', [AttendanceController::class, 'summary'])
+        ->name('attendance.summary');
 });
-
-
-
-
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
-| Profile Routes
+| Profile
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
@@ -135,6 +89,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
 
 
 

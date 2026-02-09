@@ -60,17 +60,40 @@
                 <span class="text-sm font-medium">Sections</span>
             </a>
             {{-- Attendance --}}
-            <a href="{{ route('admin.attendance.index') }}"
-                class="flex items-center gap-3 px-3 py-2 rounded-lg transition
-   {{ request()->routeIs('admin.attendance.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
+           {{-- Attendance --}}
+<div>
+    <div class="flex items-center gap-3 px-3 py-2 text-gray-700 font-semibold">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        Attendance
+    </div>
 
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+    <div class="ml-6 space-y-1">
 
-                <span class="text-sm font-medium">Attendance</span>
-            </a>
+        <a href="{{ route('admin.attendance.index') }}"
+           class="block px-3 py-2 rounded-lg text-sm
+           {{ request()->routeIs('admin.attendance.index') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
+            Bulk Attendance
+        </a>
+
+        <a href="{{ route('admin.attendance.day') }}"
+           class="block px-3 py-2 rounded-lg text-sm
+           {{ request()->routeIs('admin.attendance.day') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
+            Student Day Attendance
+        </a>
+
+        <a href="{{ route('admin.attendance.summary') }}"
+           class="block px-3 py-2 rounded-lg text-sm
+           {{ request()->routeIs('admin.attendance.summary') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
+            Attendance Summary
+        </a>
+
+    </div>
+</div>
+
 
 
 

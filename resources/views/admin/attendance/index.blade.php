@@ -178,8 +178,9 @@
 @push('scripts')
 <script>
 document.getElementById('checkAll').addEventListener('change', function () {
-    document.querySelectorAll('.student-check')
-        .forEach(cb => cb.checked = this.checked);
+    const checks = document.querySelectorAll('.student-check');
+    if (!checks.length) return;
+    checks.forEach(cb => cb.checked = this.checked);
 });
 </script>
 @endpush
