@@ -77,6 +77,14 @@ Route::middleware(['auth', 'role:admin'])
 
     Route::get('/attendance/summary', [AttendanceController::class, 'summary'])
         ->name('attendance.summary');
+
+       
+
+    Route::get('/departments/{department}/sections', [AttendanceController::class, 'sections'])
+        ->name('departments.sections');
+
+    Route::get('/attendance/ajax-students',[AttendanceController::class, 'ajaxStudents'])
+        ->name('attendance.ajaxStudents');
 });
 
 /*
