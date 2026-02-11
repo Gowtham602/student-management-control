@@ -110,6 +110,18 @@
                 </div>
 
             </div>
+            <!-- SELECTED STUDENTS PREVIEW -->
+<div class="mb-4">
+    <h3 class="text-sm font-semibold text-gray-700 mb-2">
+        Selected Students:
+        <span id="selectedCount" class="text-indigo-600">0</span>
+    </h3>
+
+    <div id="selectedPreview"
+         class="flex flex-wrap gap-2 bg-gray-50 p-3 rounded-lg border min-h-[40px]">
+    </div>
+</div>
+
 
             <!-- STUDENT TABLE -->
             <div class="overflow-x-auto rounded-xl border">
@@ -208,6 +220,29 @@ const year       = document.querySelector('select[name="year"]');
 let timer;
 
 //  Load students via AJAX
+// function loadStudents() {
+//     const params = new URLSearchParams({
+//         search: search.value,
+//         department: department.value,
+//         section: section.value,
+//         year: year.value,
+//     });
+
+//     fetch(`{{ route('admin.attendance.ajaxStudents') }}?${params}`)
+//         .then(res => res.text())
+//         .then(html => {
+//             document.getElementById('studentsTable').innerHTML = html;
+//         });
+//                 //  Re-check selected students
+//             document.querySelectorAll('.student-check').forEach(cb => {
+//                 if (selectedStudents.has(cb.value)) {
+//                     cb.checked = true;
+//                 }
+//             });
+
+
+
+// }
 function loadStudents() {
     const params = new URLSearchParams({
         search: search.value,
@@ -219,18 +254,19 @@ function loadStudents() {
     fetch(`{{ route('admin.attendance.ajaxStudents') }}?${params}`)
         .then(res => res.text())
         .then(html => {
+
             document.getElementById('studentsTable').innerHTML = html;
-        });
-                //  Re-check selected students
+
+            //  Re-check selected students AFTER table reload
             document.querySelectorAll('.student-check').forEach(cb => {
                 if (selectedStudents.has(cb.value)) {
                     cb.checked = true;
                 }
             });
 
-
-
+        });
 }
+
 document.addEventListener('DOMContentLoaded', function () {
 
     const attendanceForm = document.getElementById('attendanceForm');
@@ -238,8 +274,8 @@ document.addEventListener('DOMContentLoaded', function () {
     attendanceForm.addEventListener('submit', function () {
 
         // Remove old hidden inputs
-        document.querySelectorAll('.hidden-student').forEach(e => e.remove());
-
+       let sample= document.querySelectorAll('.hidden-student').forEach(e => e.remove());
+    console.log(sample,"_____sample");
         selectedStudents.forEach(id => {
             let input = document.createElement('input');
             input.type = 'hidden';
@@ -253,6 +289,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
+function updateSelectedPreview() {
+    const preview = document.getElementById('selectedPreview');
+    const count   = document.getElementById('selectedCount');
+
+    preview.innerHTML = '';
+
+    selectedStudents.forEach(id => {
+
+        const badge = document.createElement('div');
+        badge.className =
+            "px-3 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full flex items-center gap-2";
+
+        badge.innerHTML = `
+            ID: ${id}
+            <button type="button"
+                class="remove-btn text-red-500 font-bold"
+                data-id="${id}">
+                ×
+            </button>
+        `;
+
+        preview.appendChild(badge);
+    });
+
+    count.innerText = selectedStudents.size;
+}
 
 
 //  Auto search
@@ -291,10 +353,27 @@ department.addEventListener('change', function () {
 });
 
 //  Check all
+// document.getElementById('checkAll').addEventListener('change', function () {
+//     document.querySelectorAll('.student-check')
+//         .forEach(cb => cb.checked = this.checked);
+// });
 document.getElementById('checkAll').addEventListener('change', function () {
-    document.querySelectorAll('.student-check')
-        .forEach(cb => cb.checked = this.checked);
+
+    document.querySelectorAll('.student-check').forEach(cb => {
+
+        cb.checked = this.checked;
+
+        if (this.checked) {
+            selectedStudents.add(cb.value);
+        } else {
+            selectedStudents.delete(cb.value);
+        }
+
+    });
+
+    updateSelectedPreview();
 });
+
 
 
 // Handle checkbox click
@@ -307,6 +386,7 @@ document.addEventListener('change', function (e) {
         } else {
             selectedStudents.delete(studentId);
         }
+        updateSelectedPreview();
     }
 });
 
