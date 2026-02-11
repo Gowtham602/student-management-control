@@ -12,7 +12,7 @@
         </h2>
 
         <!-- <form method="GET"  id="filterForm" class="grid grid-cols-1 md:grid-cols-6 gap-4"> -->
-            <form method="GET" id="filterForm" class="grid grid-cols-1 md:grid-cols-6 gap-4">
+        <form method="GET" id="filterForm" class="grid grid-cols-1 md:grid-cols-6 gap-4">
 
 
             <!-- <input type="date" name="date" value="{{ $date }}"
@@ -33,13 +33,13 @@
 
             <select name="department" id="department"
                 class="border rounded-lg px-3 py-2">
-            <option value="">All Departments</option>
-            @foreach($departments as $dept)
+                <option value="">All Departments</option>
+                @foreach($departments as $dept)
                 <option value="{{ $dept->id }}">
                     {{ $dept->name }}
                 </option>
-            @endforeach
-        </select>
+                @endforeach
+            </select>
 
 
             <!-- <select name="section" class="border rounded-lg px-3 py-2">
@@ -51,7 +51,7 @@
                 @endforeach
             </select> -->
             <select name="section" id="section"
-                    class="border rounded-lg px-3 py-2" disabled>
+                class="border rounded-lg px-3 py-2" disabled>
                 <option value="">Select Department First</option>
             </select>
 
@@ -80,7 +80,7 @@
             Mark Attendance
         </h2>
 
-        <form id="attendanceForm"  method="POST" action="{{ route('admin.attendance.bulkSave') }}">
+        <form id="attendanceForm" method="POST" action="{{ route('admin.attendance.bulkSave') }}">
             @csrf
 
             <!-- ACTION BAR -->
@@ -111,16 +111,16 @@
 
             </div>
             <!-- SELECTED STUDENTS PREVIEW -->
-<div class="mb-4">
-    <h3 class="text-sm font-semibold text-gray-700 mb-2">
-        Selected Students:
-        <span id="selectedCount" class="text-indigo-600">0</span>
-    </h3>
+            <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-2">
+                    Selected Students:
+                    <span id="selectedCount" class="text-indigo-600">0</span>
+                </h3>
 
-    <div id="selectedPreview"
-         class="flex flex-wrap gap-2 bg-gray-50 p-3 rounded-lg border min-h-[40px]">
-    </div>
-</div>
+                <div id="selectedPreview"
+                    class="flex flex-wrap gap-2 bg-gray-50 p-3 rounded-lg border min-h-[40px]">
+                </div>
+            </div>
 
 
             <!-- STUDENT TABLE -->
@@ -154,6 +154,9 @@
                                 <input type="checkbox"
                                     name="students[]"
                                     value="{{ $student->id }}"
+                                    data-name="{{ $student->name }}"
+                                    data-department="{{ $student->department->name ?? '-' }}"
+                                    data-year="{{ $yearLabel }}"
                                     class="student-check w-4 h-4 rounded border-gray-300">
                             </td>
 
@@ -208,165 +211,212 @@
 
 @push('scripts')
 <script>
+    // let selectedStudents = new Set();
+    let selectedStudents = {};
+    console.log(selectedStudents, "_____new select student");
 
-let selectedStudents = new Set();
-console.log(selectedStudents,"_____new select student");
+    const search = document.querySelector('input[name="search"]');
+    const department = document.getElementById('department');
+    const section = document.getElementById('section');
+    const year = document.querySelector('select[name="year"]');
 
-const search     = document.querySelector('input[name="search"]');
-const department = document.getElementById('department');
-const section    = document.getElementById('section');
-const year       = document.querySelector('select[name="year"]');
+    let timer;
 
-let timer;
+    //  Load students via AJAX
+    // function loadStudents() {
+    //     const params = new URLSearchParams({
+    //         search: search.value,
+    //         department: department.value,
+    //         section: section.value,
+    //         year: year.value,
+    //     });
 
-//  Load students via AJAX
-// function loadStudents() {
-//     const params = new URLSearchParams({
-//         search: search.value,
-//         department: department.value,
-//         section: section.value,
-//         year: year.value,
-//     });
-
-//     fetch(`{{ route('admin.attendance.ajaxStudents') }}?${params}`)
-//         .then(res => res.text())
-//         .then(html => {
-//             document.getElementById('studentsTable').innerHTML = html;
-//         });
-//                 //  Re-check selected students
-//             document.querySelectorAll('.student-check').forEach(cb => {
-//                 if (selectedStudents.has(cb.value)) {
-//                     cb.checked = true;
-//                 }
-//             });
+    //     fetch(`{{ route('admin.attendance.ajaxStudents') }}?${params}`)
+    //         .then(res => res.text())
+    //         .then(html => {
+    //             document.getElementById('studentsTable').innerHTML = html;
+    //         });
+    //                 //  Re-check selected students
+    //             document.querySelectorAll('.student-check').forEach(cb => {
+    //                 if (selectedStudents.has(cb.value)) {
+    //                     cb.checked = true;
+    //                 }
+    //             });
 
 
 
-// }
-function loadStudents() {
-    const params = new URLSearchParams({
-        search: search.value,
-        department: department.value,
-        section: section.value,
-        year: year.value,
-    });
+    // }
+    function loadStudents() {
+        const params = new URLSearchParams({
+            search: search.value,
+            department: department.value,
+            section: section.value,
+            year: year.value,
+        });
 
-    fetch(`{{ route('admin.attendance.ajaxStudents') }}?${params}`)
-        .then(res => res.text())
-        .then(html => {
+        fetch(`{{ route('admin.attendance.ajaxStudents') }}?${params}`)
+            .then(res => res.text())
+            .then(html => {
 
-            document.getElementById('studentsTable').innerHTML = html;
+                document.getElementById('studentsTable').innerHTML = html;
 
-            //  Re-check selected students AFTER table reload
-            document.querySelectorAll('.student-check').forEach(cb => {
-                if (selectedStudents.has(cb.value)) {
-                    cb.checked = true;
-                }
+                //  Re-check selected students AFTER table reload
+                document.querySelectorAll('.student-check').forEach(cb => {
+                    if (selectedStudents[cb.value]){
+                        cb.checked = true;
+                    }
+                });
+
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const attendanceForm = document.getElementById('attendanceForm');
+
+        attendanceForm.addEventListener('submit', function() {
+
+            // Remove old hidden inputs
+            let sample = document.querySelectorAll('.hidden-student').forEach(e => e.remove());
+            console.log(sample, "_____sample");
+            selectedStudents.forEach(id => {
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'students[]';
+                input.value = id;
+                input.classList.add('hidden-student');
+                this.appendChild(input);
             });
 
         });
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-
-    const attendanceForm = document.getElementById('attendanceForm');
-
-    attendanceForm.addEventListener('submit', function () {
-
-        // Remove old hidden inputs
-       let sample= document.querySelectorAll('.hidden-student').forEach(e => e.remove());
-    console.log(sample,"_____sample");
-        selectedStudents.forEach(id => {
-            let input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'students[]';
-            input.value = id;
-            input.classList.add('hidden-student');
-            this.appendChild(input);
-        });
 
     });
 
-});
+    // function updateSelectedPreview() {
+    //     const preview = document.getElementById('selectedPreview');
+    //     const count   = document.getElementById('selectedCount');
 
-function updateSelectedPreview() {
-    const preview = document.getElementById('selectedPreview');
-    const count   = document.getElementById('selectedCount');
+    //     preview.innerHTML = '';
 
-    preview.innerHTML = '';
+    //     selectedStudents.forEach(id => {
 
-    selectedStudents.forEach(id => {
+    //         const badge = document.createElement('div');
+    //         badge.className =
+    //             "px-3 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full flex items-center gap-2";
 
-        const badge = document.createElement('div');
-        badge.className =
-            "px-3 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full flex items-center gap-2";
+    //         badge.innerHTML = `
+    //             ID: ${id}
+    //             <button type="button"
+    //                 class="remove-btn text-red-500 font-bold"
+    //                 data-id="${id}">
+    //                 ×
+    //             </button>
+    //         `;
 
-        badge.innerHTML = `
-            ID: ${id}
+    //         preview.appendChild(badge);
+    //     });
+
+    //     count.innerText = selectedStudents.size;
+    // }
+
+
+    function updateSelectedPreview() {
+
+        const preview = document.getElementById('selectedPreview');
+        const count = document.getElementById('selectedCount');
+
+        preview.innerHTML = '';
+
+        Object.keys(selectedStudents).forEach(id => {
+
+            const student = selectedStudents[id];
+
+            const badge = document.createElement('div');
+            badge.className =
+                "px-3 py-2 bg-indigo-100 text-indigo-800 text-xs rounded-xl flex items-center gap-3 shadow-sm";
+
+            badge.innerHTML = `
+            <div>
+                <div class="font-semibold">${student.name}</div>
+                <div class="text-[11px] text-gray-600">
+                    ${student.department} • ${student.year}
+                </div>
+            </div>
+
             <button type="button"
-                class="remove-btn text-red-500 font-bold"
+                class="remove-btn text-red-500 font-bold ml-2"
                 data-id="${id}">
                 ×
             </button>
         `;
 
-        preview.appendChild(badge);
-    });
+            preview.appendChild(badge);
+        });
 
-    count.innerText = selectedStudents.size;
-}
-
-
-//  Auto search
-search.addEventListener('keyup', () => {
-    clearTimeout(timer);
-    timer = setTimeout(loadStudents, 400);
-});
-
-//  Filters
-department.addEventListener('change', loadStudents);
-section.addEventListener('change', loadStudents);
-year.addEventListener('change', loadStudents);
-
-//  Department → Section
-department.addEventListener('change', function () {
-    const deptId = this.value;
-
-    section.innerHTML = '<option>Loading...</option>';
-    section.disabled = true;
-
-    if (!deptId) {
-        section.innerHTML = '<option>Select Department First</option>';
-        return;
+        count.innerText = Object.keys(selectedStudents).length;
     }
 
-    fetch(`/admin/departments/${deptId}/sections`)
-        .then(res => res.json())
-        .then(data => {
-            section.innerHTML = '<option value="">All Sections</option>';
-            data.forEach(sec => {
-                section.innerHTML +=
-                    `<option value="${sec.id}">${sec.name}</option>`;
-            });
-            section.disabled = false;
-        });
-});
 
-//  Check all
-// document.getElementById('checkAll').addEventListener('change', function () {
-//     document.querySelectorAll('.student-check')
-//         .forEach(cb => cb.checked = this.checked);
-// });
-document.getElementById('checkAll').addEventListener('change', function () {
+    //  Auto search
+    search.addEventListener('keyup', () => {
+        clearTimeout(timer);
+        timer = setTimeout(loadStudents, 400);
+    });
+
+    //  Filters
+    department.addEventListener('change', loadStudents);
+    section.addEventListener('change', loadStudents);
+    year.addEventListener('change', loadStudents);
+
+    //  Department → Section
+    department.addEventListener('change', function() {
+        const deptId = this.value;
+
+        section.innerHTML = '<option>Loading...</option>';
+        section.disabled = true;
+
+        if (!deptId) {
+            section.innerHTML = '<option>Select Department First</option>';
+            return;
+        }
+
+        fetch(`/admin/departments/${deptId}/sections`)
+            .then(res => res.json())
+            .then(data => {
+                section.innerHTML = '<option value="">All Sections</option>';
+                data.forEach(sec => {
+                    section.innerHTML +=
+                        `<option value="${sec.id}">${sec.name}</option>`;
+                });
+                section.disabled = false;
+            });
+    });
+
+    //  Check all
+    // document.getElementById('checkAll').addEventListener('change', function () {
+    //     document.querySelectorAll('.student-check')
+    //         .forEach(cb => cb.checked = this.checked);
+    // });
+  document.getElementById('checkAll').addEventListener('change', function() {
 
     document.querySelectorAll('.student-check').forEach(cb => {
 
         cb.checked = this.checked;
 
+        const id = cb.value;
+
         if (this.checked) {
-            selectedStudents.add(cb.value);
+
+            selectedStudents[id] = {
+                name: cb.dataset.name,
+                department: cb.dataset.department,
+                year: cb.dataset.year
+            };
+
         } else {
-            selectedStudents.delete(cb.value);
+
+            delete selectedStudents[id];
+
         }
 
     });
@@ -376,20 +426,45 @@ document.getElementById('checkAll').addEventListener('change', function () {
 
 
 
-// Handle checkbox click
-document.addEventListener('change', function (e) {
-    if (e.target.classList.contains('student-check')) {
-        const studentId = e.target.value;
 
-        if (e.target.checked) {
-            selectedStudents.add(studentId);
-        } else {
-            selectedStudents.delete(studentId);
+    // Handle checkbox click
+    // document.addEventListener('change', function (e) {
+    //     if (e.target.classList.contains('student-check')) {
+    //         const studentId = e.target.value;
+
+    //         if (e.target.checked) {
+    //             selectedStudents.add(studentId);
+    //         } else {
+    //             selectedStudents.delete(studentId);
+    //         }
+    //         updateSelectedPreview();
+    //     }
+    // });
+
+    document.addEventListener('change', function(e) {
+
+        if (e.target.classList.contains('student-check')) {
+
+            const id = e.target.value;
+
+            if (e.target.checked) {
+
+                selectedStudents[id] = {
+                    name: e.target.dataset.name,
+                    department: e.target.dataset.department,
+                    year: e.target.dataset.year
+                };
+
+            } else {
+
+                delete selectedStudents[id];
+
+            }
+
+            updateSelectedPreview();
         }
-        updateSelectedPreview();
-    }
-});
 
+    });
 </script>
 
 @endpush
