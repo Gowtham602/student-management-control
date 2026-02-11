@@ -80,7 +80,7 @@
             Mark Attendance
         </h2>
 
-        <form method="POST" action="{{ route('admin.attendance.bulkSave') }}">
+        <form id="attendanceForm"  method="POST" action="{{ route('admin.attendance.bulkSave') }}">
             @csrf
 
             <!-- ACTION BAR -->
@@ -196,6 +196,10 @@
 
 @push('scripts')
 <script>
+
+let selectedStudents = new Set();
+console.log(selectedStudents,"_____new select student");
+
 const search     = document.querySelector('input[name="search"]');
 const department = document.getElementById('department');
 const section    = document.getElementById('section');
@@ -217,7 +221,39 @@ function loadStudents() {
         .then(html => {
             document.getElementById('studentsTable').innerHTML = html;
         });
+                //  Re-check selected students
+            document.querySelectorAll('.student-check').forEach(cb => {
+                if (selectedStudents.has(cb.value)) {
+                    cb.checked = true;
+                }
+            });
+
+
+
 }
+document.addEventListener('DOMContentLoaded', function () {
+
+    const attendanceForm = document.getElementById('attendanceForm');
+
+    attendanceForm.addEventListener('submit', function () {
+
+        // Remove old hidden inputs
+        document.querySelectorAll('.hidden-student').forEach(e => e.remove());
+
+        selectedStudents.forEach(id => {
+            let input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'students[]';
+            input.value = id;
+            input.classList.add('hidden-student');
+            this.appendChild(input);
+        });
+
+    });
+
+});
+
+
 
 //  Auto search
 search.addEventListener('keyup', () => {
@@ -259,6 +295,21 @@ document.getElementById('checkAll').addEventListener('change', function () {
     document.querySelectorAll('.student-check')
         .forEach(cb => cb.checked = this.checked);
 });
+
+
+// Handle checkbox click
+document.addEventListener('change', function (e) {
+    if (e.target.classList.contains('student-check')) {
+        const studentId = e.target.value;
+
+        if (e.target.checked) {
+            selectedStudents.add(studentId);
+        } else {
+            selectedStudents.delete(studentId);
+        }
+    }
+});
+
 </script>
 
 @endpush
