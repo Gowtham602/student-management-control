@@ -15,88 +15,86 @@
 
         {{-- Dashboard --}}
         <a href="{{ route('admin.dashboard') }}"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg transition
+           class="flex items-center gap-3 px-3 py-2 rounded-lg transition
            {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
-
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h5m4 0h5a1 1 0 001-1V10" />
             </svg>
-
-            <span class="text-sm font-medium">Dashboard</span>
+           <span class="text-sm font-medium">Dashboard</span>
         </a>
 
-       
-
-        {{-- Departments --}}
-        <a href="{{ route('admin.departments.index') }}"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg transition
-   {{ request()->routeIs('departments.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
-
-            <svg class="w-5 h-5 text-current" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 22h18v-2H3v2zm2-4h14V4l-7-3-7 3v14zm4-2h2v-2H9v2zm0-4h2v-2H9v2zm4 4h2v-2h-2v2zm0-4h2v-2h-2v2z" />
-            </svg>
-
-            <span class="text-sm font-medium">Departments</span>
-            <a href="{{ route('admin.sections.index') }}"
-                class="flex items-center gap-3 px-3 py-2 rounded-lg transition
-   {{ request()->routeIs('sections.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
-
-                <svg class="w-5 h-5 text-current" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z" />
-                </svg>
-
-                <span class="text-sm font-medium">Sections</span>
-            </a>
-             {{-- Students --}}
+        {{-- Students --}}
         <a href="{{ route('admin.students.index') }}"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg transition
+           class="flex items-center gap-3 px-3 py-2 rounded-lg transition
            {{ request()->routeIs('admin.students.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
-
+          
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m4-4a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
-
-            <span class="text-sm font-medium">Students</span>
+           <span class="text-sm font-medium">Students</span>
         </a>
-            {{-- Attendance --}}
-           {{-- Attendance --}}
-<div>
-    <div class="flex items-center gap-3 px-3 py-2 text-gray-700 font-semibold">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+
+        {{-- Departments --}}
+        <a href="{{ route('admin.departments.index') }}"
+           class="flex items-center gap-3 px-3 py-2 rounded-lg transition
+           {{ request()->routeIs('admin.departments.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
+           <svg class="w-5 h-5 text-current" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 22h18v-2H3v2zm2-4h14V4l-7-3-7 3v14zm4-2h2v-2H9v2zm0-4h2v-2H9v2zm4 4h2v-2h-2v2zm0-4h2v-2h-2v2z" />
+            </svg>
+           <span class="text-sm font-medium">Departments</span>
+        </a>
+
+        {{-- Sections --}}
+        <a href="{{ route('admin.sections.index') }}"
+           class="flex items-center gap-3 px-3 py-2 rounded-lg transition
+           {{ request()->routeIs('admin.sections.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
+           
+                
+                <svg class="w-5 h-5 text-current" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z" />
+                </svg>
+           <span class="text-sm font-medium">Sections</span>
+        </a>
+
+        {{-- Attendance (Active when any attendance page) --}}
+        <div class="mt-2">
+
+            <div class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium
+                {{ request()->routeIs('admin.attendance.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700' }}">
+               
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
              viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
         </svg>
-        Attendance
-    </div>
+                Attendance
+            </div>
 
-    <div class="ml-6 space-y-1">
+            <div class="ml-6 mt-1 space-y-1">
 
-        <a href="{{ route('admin.attendance.index') }}"
-           class="block px-3 py-2 rounded-lg text-sm
-           {{ request()->routeIs('admin.attendance.index') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
-            Bulk Attendance
-        </a>
+                <a href="{{ route('admin.attendance.index') }}"
+                   class="block px-3 py-2 rounded-lg text-sm transition
+                   {{ request()->routeIs('admin.attendance.index') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
+                    Bulk Attendance
+                </a>
 
-        <a href="{{ route('admin.attendance.day') }}"
-           class="block px-3 py-2 rounded-lg text-sm
-           {{ request()->routeIs('admin.attendance.day') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
-            Student Day Attendance
-        </a>
+                <a href="{{ route('admin.attendance.day') }}"
+                   class="block px-3 py-2 rounded-lg text-sm transition
+                   {{ request()->routeIs('admin.attendance.day') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
+                    Student Day Attendance
+                </a>
 
-        <a href="{{ route('admin.attendance.summary') }}"
-           class="block px-3 py-2 rounded-lg text-sm
-           {{ request()->routeIs('admin.attendance.summary') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
-            Attendance Summary
-        </a>
+                <a href="{{ route('admin.attendance.summary') }}"
+                   class="block px-3 py-2 rounded-lg text-sm transition
+                   {{ request()->routeIs('admin.attendance.summary') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
+                    Attendance Summary
+                </a>
 
-    </div>
-</div>
-
-
-
+            </div>
+        </div>
+        
 
     </nav>
 
