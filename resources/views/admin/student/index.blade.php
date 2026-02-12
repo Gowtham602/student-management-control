@@ -80,6 +80,11 @@
                     action="{{ route('admin.students.index') }}"
                     class="flex flex-wrap gap-3 justify-center items-center">
 
+
+
+                    
+
+
                     <!-- Department -->
                     <select name="department"
                         class="rounded-lg border px-4 py-2 min-w-[160px] focus:ring-2 focus:ring-indigo-200">
@@ -93,11 +98,6 @@
                         @endforeach
                     </select>
 
-                    <!-- Section -->
-                    <select name="section" id="filterSection"
-                        class="rounded-lg border px-4 py-2 min-w-[140px] focus:ring-2 focus:ring-indigo-200">
-                        <option value="">All Sections</option>
-                    </select>
 
                     <select name="year"
                         class="rounded-lg border px-4 py-2 min-w-[120px] focus:ring-2 focus:ring-indigo-200">
@@ -108,6 +108,22 @@
                         <option value="3">3rd Year</option>
                         <option value="4">4th Year</option>
                     </select>
+
+                    <!-- Section -->
+                    <select name="section" id="filterSection"
+                        class="rounded-lg border px-4 py-2 min-w-[140px] focus:ring-2 focus:ring-indigo-200">
+                        <option value="">All Sections</option>
+                    </select>
+
+                    <!-- <select name="year"
+                        class="rounded-lg border px-4 py-2 min-w-[120px] focus:ring-2 focus:ring-indigo-200">
+
+                        <option value="">All Years</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select> -->
 
 
                     <!-- Year -->
