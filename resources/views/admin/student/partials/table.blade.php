@@ -17,7 +17,11 @@
             @forelse($students as $student)
                 <tr class="hover:bg-indigo-50 transition">
                     <td class="px-6 py-4 font-semibold text-gray-700">
-                        {{ $loop->iteration }}
+                        <!-- {{ $loop->iteration }} -->
+                          <!-- {{ ($students->currentPage() - 1) * $students->perPage() + $loop->iteration }} -->
+                            {{ $students->firstItem() + $loop->index }}
+
+
                     </td>
 
                     <td class="px-6 py-4">

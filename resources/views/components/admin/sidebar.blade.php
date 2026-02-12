@@ -26,18 +26,7 @@
             <span class="text-sm font-medium">Dashboard</span>
         </a>
 
-        {{-- Students --}}
-        <a href="{{ route('admin.students.index') }}"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg transition
-           {{ request()->routeIs('admin.students.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
-
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m4-4a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-
-            <span class="text-sm font-medium">Students</span>
-        </a>
+       
 
         {{-- Departments --}}
         <a href="{{ route('admin.departments.index') }}"
@@ -59,6 +48,18 @@
 
                 <span class="text-sm font-medium">Sections</span>
             </a>
+             {{-- Students --}}
+        <a href="{{ route('admin.students.index') }}"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg transition
+           {{ request()->routeIs('admin.students.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
+
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m4-4a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+
+            <span class="text-sm font-medium">Students</span>
+        </a>
             {{-- Attendance --}}
            {{-- Attendance --}}
 <div>
