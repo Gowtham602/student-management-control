@@ -13,6 +13,17 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    // sms config take to env file 
+
+    'sms' => [
+    'username' => env('SMS_USERNAME'),
+    'password' => env('SMS_API_PASSWORD'),
+    'sender'   => env('SMS_SENDER'),
+    'priority' => env('SMS_PRIORITY'),
+    'e_id'     => env('SMS_E_ID'),
+    't_id'     => env('SMS_T_ID'),
+    'base_url' => env('SMS_BASE_URL'),
+],
 
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),

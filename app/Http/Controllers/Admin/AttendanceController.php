@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\{Student, Attendance, Department, Section};
 use Illuminate\Http\Request;
+use App\Services\SmsService;
+use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
 {
@@ -122,23 +124,79 @@ class AttendanceController extends Controller
     | Bulk Save Attendance
     |--------------------------------------------------------------------------
     */
-    public function bulkSave(Request $request)
-    {
-        $request->validate([
-            'date'     => 'required|date',
-            'status'   => 'required|in:P,A,H',
-            'students' => 'required|array',
-        ]);
+    // public function bulkSave(Request $request)
+    // {
+    //     $request->validate([
+    //         'date'     => 'required|date',
+    //         'status'   => 'required|in:P,A,H',
+    //         'students' => 'required|array',
+    //     ]);
+
+    //     foreach ($request->students as $studentId) {
+    //         Attendance::updateOrCreate(
+    //             ['student_id' => $studentId, 'date' => $request->date],
+    //             ['status' => $request->status]
+    //         );
+    //     }
+
+    //     return back()->with('success', 'Attendance saved successfully ');
+    // }
+
+
+  public function bulkSave(Request $request)
+{
+    $request->validate([
+        'date'     => 'required|date',
+        'status'   => 'required|in:P,A,H',
+        'students' => 'required|array',
+    ]);
+
+    DB::beginTransaction();
+
+    try {
 
         foreach ($request->students as $studentId) {
+
+            $student = Student::find($studentId);
+
             Attendance::updateOrCreate(
                 ['student_id' => $studentId, 'date' => $request->date],
                 ['status' => $request->status]
             );
+
+            /*
+            |--------------------------------------------------------------------------
+            | SEND OTP SMS ONLY IF ABSENT
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                $request->status === 'A' &&
+                $student &&
+                !empty($student->father_phone)
+            ) {
+
+                $otp = rand(100000, 999999);
+
+                // MUST  change temp latter 
+                $message = "Please use this OTP {$otp} for your registration. IDLSMS";
+
+                SmsService::send($student->father_phone, $message);
+            }
         }
 
-        return back()->with('success', 'Attendance saved successfully ');
+        DB::commit();
+
+        return back()->with('success', 'Attendance saved & OTP SMS sent');
+
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+
+        return back()->with('error', $e->getMessage());
     }
+}
+
 
     /*
     |--------------------------------------------------------------------------
