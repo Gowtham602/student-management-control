@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('status', ['P', 'A', 'H'])->nullable();
             $table->timestamps();
 
-            $table->unique(['student_id', 'date']);
+            $table->unique(['student_id', 'date']);  
         });
     }
 

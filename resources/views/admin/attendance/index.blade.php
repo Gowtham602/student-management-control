@@ -80,7 +80,7 @@
             Mark Attendance
         </h2>
 
-        <form id="attendanceForm" method="POST" action="{{ route('admin.attendance.bulkSave') }}">
+        <form id="attendanceForm" method="POST" action="{{ route('admin.attendance.bulkSave') }}"> 
             @csrf
 
             <!-- ACTION BAR -->
@@ -140,64 +140,27 @@
                         </tr>
                     </thead>
 
+                    
                     <tbody id="studentsTable" class="divide-y">
-                        @foreach($students as $student)
-                        @php
-                        $yearLevel = now()->year - $student->admission_year + 1;
-                        $yearLabel = $yearLevel >= 1 && $yearLevel <= 4
-                            ? $yearLevel . ' Year'
-                            : 'Passout' ;
-                            @endphp
+    @if($students->isEmpty() && !request()->hasAny(['search','department','section','year']))
+        <tr>
+            <td colspan="6" class="text-center py-6 text-gray-400">
+                Please select a filter to view students
+            </td>
+        </tr>
+    @else
+        @forelse($students as $student)
+            {{-- your row --}}
+        @empty
+            <tr>
+                <td colspan="6" class="text-center py-4 text-gray-500">
+                    No students found
+                </td>
+            </tr>
+        @endforelse
+    @endif
+</tbody>
 
-                            <tr class="hover:bg-indigo-50 transition">
-                            <td class="px-4 py-3 text-center">
-                                <input type="checkbox"
-                                    name="students[]"
-                                    value="{{ $student->id }}"
-                                    data-name="{{ $student->name }}"
-                                    data-department="{{ $student->department->name ?? '-' }}"
-                                    data-year="{{ $yearLabel }}"
-                                    class="student-check w-4 h-4 rounded border-gray-300">
-                            </td>
-
-                            <td class="px-4 py-3 font-medium text-gray-800">
-                                {{ $student->rollnum }}
-                            </td>
-
-                            <td class="px-4 py-3 text-gray-900">
-                                {{ $student->name }}
-                            </td>
-
-                            <!-- YEAR BADGE -->
-                            <td class="px-4 py-3">
-                                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold
-                        {{ $yearLabel === 'Passout'
-                            ? 'bg-gray-200 text-gray-700'
-                            : 'bg-indigo-100 text-indigo-700' }}">
-                                    <!-- Graduation Cap SVG -->
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="w-4 h-4"
-                                        fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 14l9-5-9-5-9 5 9 5z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 14v7" />
-                                    </svg>
-                                    {{ $yearLabel }}
-                                </span>
-                            </td>
-
-                            <td class="px-4 py-3 text-gray-600">
-                                {{ $student->department->name ?? '-' }}
-                            </td>
-
-                            <td class="px-4 py-3 text-gray-600">
-                                {{ $student->section->name ?? '-' }}
-                            </td>
-                            </tr>
-                            @endforeach
-                    </tbody>
                 </table>
             </div>
 
@@ -270,27 +233,49 @@
             });
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    // document.addEventListener('DOMContentLoaded', function() {
 
-        const attendanceForm = document.getElementById('attendanceForm');
+    //     const attendanceForm = document.getElementById('attendanceForm');
 
-        attendanceForm.addEventListener('submit', function() {
+    //     attendanceForm.addEventListener('submit', function() {
 
-            // Remove old hidden inputs
-            let sample = document.querySelectorAll('.hidden-student').forEach(e => e.remove());
-            console.log(sample, "_____sample");
-            selectedStudents.forEach(id => {
-                let input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'students[]';
-                input.value = id;
-                input.classList.add('hidden-student');
-                this.appendChild(input);
-            });
+            
+    //         let sample = document.querySelectorAll('.hidden-student').forEach(e => e.remove());
+    //         console.log(sample, "_____sample");
+    //         selectedStudents.forEach(id => {
+    //             let input = document.createElement('input');
+    //             input.type = 'hidden';
+    //             input.name = 'students[]';
+    //             input.value = id;
+    //             input.classList.add('hidden-student');
+    //             this.appendChild(input);
+    //         });
 
-        });
+    //     });
 
+    // });
+
+    const attendanceForm = document.getElementById('attendanceForm');
+
+    attendanceForm.addEventListener('submit', function() {
+
+
+    document.querySelectorAll('.hidden-student')
+        .forEach(e => e.remove());
+
+    Object.keys(selectedStudents).forEach(id => {
+
+        let input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'students[]';
+        input.value = id;
+        input.classList.add('hidden-student');
+
+        this.appendChild(input);
     });
+
+});
+
 
     // function updateSelectedPreview() {
     //     const preview = document.getElementById('selectedPreview');
@@ -364,7 +349,65 @@
     });
 
     //  Filters
-    department.addEventListener('change', loadStudents);
+    // department.addEventListener('change', loadStudents);
+    search.addEventListener('keyup', () => {
+    clearTimeout(timer);
+    timer = setTimeout(loadStudents, 400);
+});
+
+section.addEventListener('change', loadStudents);
+year.addEventListener('change', loadStudents);
+
+    department.addEventListener('change', function() {
+
+    const deptId = this.value;
+
+    section.innerHTML = '<option>Loading...</option>';
+    section.disabled = true;
+
+    if (!deptId) {
+        section.innerHTML = '<option value="">All Sections</option>';
+        section.disabled = true;
+
+        loadStudents(); //  reload students when cleared
+        return;
+    }
+
+    fetch(`/admin/departments/${deptId}/sections`)
+        .then(res => res.json())
+        .then(data => {
+
+            section.innerHTML = '<option value="">All Sections</option>';
+
+            data.forEach(sec => {
+                section.innerHTML +=
+                    `<option value="${sec.id}">${sec.name}</option>`;
+            });
+
+            section.disabled = false;
+
+            loadStudents(); //  LOAD AFTER sections ready
+        });
+
+});
+search.disabled = true;
+
+department.addEventListener('change', function () {
+
+    if (this.value) {
+        search.disabled = false;
+    } else {
+        search.disabled = true;
+        document.getElementById('studentsTable').innerHTML =
+            `<tr>
+                <td colspan="6" class="text-center py-6 text-gray-400">
+                    Please select a filter to view students
+                </td>
+            </tr>`;
+    }
+});
+
+
     section.addEventListener('change', loadStudents);
     year.addEventListener('change', loadStudents);
 

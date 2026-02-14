@@ -19,6 +19,8 @@
     <td class="px-4 py-3">{{ $student->name }}</td>
     <td class="px-4 py-3">
         {{ now()->year - $student->admission_year + 1 }} Year
+          <!-- {{ $yearLabel }} -->
+
     </td>
     <td class="px-4 py-3">{{ $student->department->name ?? '-' }}</td>
     <td class="px-4 py-3">{{ $student->section->name ?? '-' }}</td>
