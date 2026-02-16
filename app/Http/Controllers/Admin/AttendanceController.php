@@ -415,12 +415,56 @@ public function bulkSave(Request $request)
     // }
 
 
+// public function dayList(Request $request)
+// {
+//     $currentYear = now()->year;
+//     $date = $request->date ?? now()->toDateString();
+
+//     // Start empty query
+//     $query = Student::with([
+//         'department',
+//         'section',
+//         'attendances' => function ($q) use ($date) {
+//             $q->whereDate('date', $date);
+//         }
+//     ])
+//     ->whereRaw("(? - admission_year + 1) BETWEEN 1 AND 4", [$currentYear]);
+
+//     if ($request->filled(['department','section','year'])) {
+
+//         $query->where('department_id', $request->department)
+//               ->where('section_id', $request->section)
+//               ->whereRaw("(? - admission_year + 1) = ?", [
+//                   $currentYear,
+//                   (int) $request->year
+//               ]);
+//     } else {
+//         // Force empty result but keep paginator
+//         $query->whereRaw("1 = 0");
+//     }
+
+//     $students = $query->orderBy('rollnum')
+//                       ->paginate(15)
+//                       ->withQueryString();
+
+//     return view('admin.attendance.day', [
+//         'students' => $students,
+//         'date' => $date,
+//         'departments' => Department::orderBy('name')->get(),
+//         'sections' => $request->department
+//             ? Section::where('department_id', $request->department)
+//                 ->orderBy('name')
+//                 ->get()
+//             : collect(),
+//     ]);
+// }
+
+
 public function dayList(Request $request)
 {
     $currentYear = now()->year;
     $date = $request->date ?? now()->toDateString();
 
-    // Start empty query
     $query = Student::with([
         'department',
         'section',
@@ -438,27 +482,50 @@ public function dayList(Request $request)
                   $currentYear,
                   (int) $request->year
               ]);
+
     } else {
-        // Force empty result but keep paginator
         $query->whereRaw("1 = 0");
     }
 
-    $students = $query->orderBy('rollnum')
-                      ->paginate(15)
-                      ->withQueryString();
+    // Get paginated students (for table)
+    $students = (clone $query)
+                    ->orderBy('rollnum')
+                    ->paginate(15)
+                    ->withQueryString();
+
+    // Get all students (for counting only)
+    $allStudents = (clone $query)->get();
+
+    $presentCount = 0;
+    $absentCount  = 0;
+    $notMarked    = 0;
+
+    foreach ($allStudents as $student) {
+        $attendance = $student->attendances->first();
+
+        if (!$attendance) {
+            $notMarked++;
+        } elseif ($attendance->status === 'P') {
+            $presentCount++;
+        } elseif ($attendance->status === 'A') {
+            $absentCount++;
+        }
+    }
 
     return view('admin.attendance.day', [
-        'students' => $students,
-        'date' => $date,
-        'departments' => Department::orderBy('name')->get(),
-        'sections' => $request->department
+        'students'     => $students,
+        'date'         => $date,
+        'presentCount' => $presentCount,
+        'absentCount'  => $absentCount,
+        'notMarked'    => $notMarked,
+        'departments'  => Department::orderBy('name')->get(),
+        'sections'     => $request->department
             ? Section::where('department_id', $request->department)
                 ->orderBy('name')
                 ->get()
             : collect(),
     ]);
 }
-
 
 
 

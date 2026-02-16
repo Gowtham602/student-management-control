@@ -56,23 +56,65 @@
         </a>
 
     </form>
+    @if($students->count())
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+
+    <div class="bg-indigo-100 p-4 rounded-xl shadow">
+        <h3 class="text-sm text-gray-600">Total Students</h3>
+        <p class="text-2xl font-bold text-indigo-700">
+            {{ $students->count() }}
+        </p>
+    </div>
+
+    <div class="bg-green-100 p-4 rounded-xl shadow">
+        <h3 class="text-sm text-gray-600">Present</h3>
+        <p class="text-2xl font-bold text-green-700">
+            {{ $presentCount }}
+        </p>
+    </div>
+
+    <div class="bg-red-100 p-4 rounded-xl shadow">
+        <h3 class="text-sm text-gray-600">Absent</h3>
+        <p class="text-2xl font-bold text-red-700">
+            {{ $absentCount }}
+        </p>
+    </div>
+
+    <div class="bg-yellow-100 p-4 rounded-xl shadow">
+        <h3 class="text-sm text-gray-600">Not Marked</h3>
+        <p class="text-2xl font-bold text-yellow-700">
+            {{ $notMarked }}
+        </p>
+    </div>
+
+</div>
+
+@endif
+
 
     <!-- TABLE -->
-    <div class="bg-white rounded-2xl shadow border overflow-x-auto">
-        <table class="min-w-full text-sm">
-            <thead class="bg-gray-100">
+   <!-- TABLE -->
+<div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm text-gray-700">
+
+            <!-- HEADER -->
+            <thead class="bg-gradient-to-r from-indigo-50 to-indigo-100 text-gray-700 uppercase text-xs tracking-wider">
                 <tr>
-                    <th class="px-4 py-3">S.No</th>
-                    <th class="px-4 py-3">Roll No</th>
-                    <th class="px-4 py-3">Name</th>
-                    <th class="px-4 py-3">Year</th>
-                    <th class="px-4 py-3">Department</th>
-                    <th class="px-4 py-3">Section</th>
-                    <th class="px-4 py-3 text-center">Status</th>
+                    <th class="px-5 py-4 text-left w-16">#</th>
+                    <th class="px-5 py-4 text-left">Roll No</th>
+                    <th class="px-5 py-4 text-left">Student Name</th>
+                    <th class="px-5 py-4 text-left">Year</th>
+                    <th class="px-5 py-4 text-left">Department</th>
+                    <th class="px-5 py-4 text-left">Section</th>
+                    <th class="px-5 py-4 text-center">Status</th>
                 </tr>
             </thead>
 
-            <tbody class="divide-y">
+            <!-- BODY -->
+            <tbody class="divide-y divide-gray-100 bg-white">
 
                 @if(request()->filled(['department','section','year']))
 
@@ -84,59 +126,99 @@
                             $year = now()->year - $student->admission_year + 1;
                         @endphp
 
-                        <tr class="hover:bg-indigo-50">
-                            <td class="px-4 py-3">
-                                {{ $students->firstItem() + $loop->index }}
+                        <tr class="hover:bg-indigo-50 transition duration-150">
+
+                            <!-- S.NO -->
+                            <td class="px-5 py-4 font-medium text-gray-500">
+                                {{ $loop->iteration }}
                             </td>
-                            <td class="px-4 py-3 font-medium">
+
+                            <!-- ROLL -->
+                            <td class="px-5 py-4 font-semibold text-indigo-600">
                                 {{ $student->rollnum }}
                             </td>
-                            <td class="px-4 py-3">
-                                {{ $student->name }}
+
+                            <!-- NAME -->
+                            <td class="px-5 py-4">
+                                <div class="font-medium text-gray-800">
+                                    {{ $student->name }}
+                                </div>
                             </td>
-                            <td class="px-4 py-3">
-                                {{ $year }}
-                            </td>
-                            <td class="px-4 py-3">
-                                {{ $student->department->name ?? '-' }}
-                            </td>
-                            <td class="px-4 py-3">
-                                {{ $student->section->name ?? '-' }}
-                            </td>
-                            <td class="px-4 py-3 text-center">
-                                <span class="px-3 py-1 rounded-full text-xs font-bold
-                                    {{ $status === 'P' ? 'bg-green-100 text-green-700' : '' }}
-                                    {{ $status === 'A' ? 'bg-red-100 text-red-700' : '' }}
-                                    {{ $status === 'H' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                    {{ $status === '-' ? 'bg-gray-100 text-gray-500' : '' }}">
-                                    {{ $status }}
+
+                            <!-- YEAR -->
+                            <td class="px-5 py-4">
+                                <span class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-700 font-semibold">
+                                    {{ $year }} Year
                                 </span>
                             </td>
+
+                            <!-- DEPT -->
+                            <td class="px-5 py-4">
+                                {{ $student->department->name ?? '-' }}
+                            </td>
+
+                            <!-- SECTION -->
+                            <td class="px-5 py-4">
+                                {{ $student->section->name ?? '-' }}
+                            </td>
+
+                            <!-- STATUS -->
+                            <td class="px-5 py-4 text-center">
+                                @if($status === 'P')
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">
+                                        ● Present
+                                    </span>
+                                @elseif($status === 'A')
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
+                                        ● Absent
+                                    </span>
+                                @elseif($status === 'H')
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700">
+                                        ● Holiday
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-500">
+                                        ● Not Marked
+                                    </span>
+                                @endif
+                            </td>
+
                         </tr>
 
                     @empty
+
                         <tr>
-                            <td colspan="7" class="text-center py-6 text-gray-400">
-                                No students found.
+                            <td colspan="7" class="text-center py-12 text-gray-400">
+                                <div class="flex flex-col items-center gap-2">
+                                    <span class="text-4xl"></span>
+                                    <p>No students found for selected filters.</p>
+                                </div>
                             </td>
                         </tr>
+
                     @endforelse
 
                 @else
                     <tr>
-                        <td colspan="7" class="text-center py-10 text-gray-400">
-                            Please select Department, Year and Section.
+                        <td colspan="7" class="text-center py-16 text-gray-400">
+                            <div class="flex flex-col items-center gap-2">
+                                <span class="text-4xl"></span>
+                                <p>Please select Department, Year and Section.</p>
+                            </div>
                         </td>
                     </tr>
                 @endif
 
             </tbody>
+
         </table>
     </div>
+</div>
+
 
     @if(request()->filled(['department','section','year']))
         <div class="mt-4">
-            {{ $students->links() }}
+            <!-- {{ $students->links() }} -->
         </div>
     @endif
 
