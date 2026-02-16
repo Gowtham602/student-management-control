@@ -384,35 +384,82 @@ public function bulkSave(Request $request)
 
     //     return view('admin.attendance.day', compact('students', 'date'));
     // }
-    public function dayList(Request $request)
-    {
-        $date = $request->date ?? now()->toDateString();
-        $currentYear = now()->year;
+    // public function dayList(Request $request)
+    // {
+    //     $date = $request->date ?? now()->toDateString();
+    //     $currentYear = now()->year;
 
-        $students = Student::with(['attendances' => function ($q) use ($date) {
+    //     $students = Student::with(['attendances' => function ($q) use ($date) {
+    //         $q->whereDate('date', $date);
+    //     }])
+
+    //         //  ONLY CURRENT STUDENTS (I–IV YEAR)
+    //         ->whereRaw(
+    //             "(? - admission_year + 1) BETWEEN 1 AND 4",
+    //             [$currentYear]
+    //         )
+
+    //         //  YEAR FILTER (1 / 2 / 3 / 4)
+    //         ->when($request->year, function ($q) use ($request, $currentYear) {
+    //             $q->whereRaw(
+    //                 "(? - admission_year + 1) = ?",
+    //                 [$currentYear, (int) $request->year]
+    //             );
+    //         })
+
+    //         ->orderByRaw("(? - admission_year + 1)", [$currentYear])
+    //         ->orderBy('rollnum')
+    //         ->get();
+
+    //     return view('admin.attendance.day', compact('students', 'date'));
+    // }
+
+
+public function dayList(Request $request)
+{
+    $currentYear = now()->year;
+    $date = $request->date ?? now()->toDateString();
+
+    // Start empty query
+    $query = Student::with([
+        'department',
+        'section',
+        'attendances' => function ($q) use ($date) {
             $q->whereDate('date', $date);
-        }])
+        }
+    ])
+    ->whereRaw("(? - admission_year + 1) BETWEEN 1 AND 4", [$currentYear]);
 
-            //  ONLY CURRENT STUDENTS (I–IV YEAR)
-            ->whereRaw(
-                "(? - admission_year + 1) BETWEEN 1 AND 4",
-                [$currentYear]
-            )
+    if ($request->filled(['department','section','year'])) {
 
-            //  YEAR FILTER (1 / 2 / 3 / 4)
-            ->when($request->year, function ($q) use ($request, $currentYear) {
-                $q->whereRaw(
-                    "(? - admission_year + 1) = ?",
-                    [$currentYear, (int) $request->year]
-                );
-            })
-
-            ->orderByRaw("(? - admission_year + 1)", [$currentYear])
-            ->orderBy('rollnum')
-            ->get();
-
-        return view('admin.attendance.day', compact('students', 'date'));
+        $query->where('department_id', $request->department)
+              ->where('section_id', $request->section)
+              ->whereRaw("(? - admission_year + 1) = ?", [
+                  $currentYear,
+                  (int) $request->year
+              ]);
+    } else {
+        // Force empty result but keep paginator
+        $query->whereRaw("1 = 0");
     }
+
+    $students = $query->orderBy('rollnum')
+                      ->paginate(15)
+                      ->withQueryString();
+
+    return view('admin.attendance.day', [
+        'students' => $students,
+        'date' => $date,
+        'departments' => Department::orderBy('name')->get(),
+        'sections' => $request->department
+            ? Section::where('department_id', $request->department)
+                ->orderBy('name')
+                ->get()
+            : collect(),
+    ]);
+}
+
+
 
 
 
