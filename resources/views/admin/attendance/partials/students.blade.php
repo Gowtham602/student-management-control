@@ -1,4 +1,19 @@
+
+
+
+@if($attendanceExists)
+
+<tr>
+    <td colspan="7" class="text-center py-6 text-red-500 font-semibold">
+        Attendance is Locked for this Date
+    </td>
+</tr>
+
+@else
+
 @forelse($students as $student)
+    {{-- your existing row code --}}
+    @forelse($students as $student)
 
 @php
     $yearLevel = now()->year - $student->admission_year + 1;
@@ -49,3 +64,12 @@
     </td>
 </tr>
 @endforelse
+@empty
+<tr>
+    <td colspan="7" class="text-center py-4 text-gray-500">
+        No students found
+    </td>
+</tr>
+@endforelse
+
+@endif

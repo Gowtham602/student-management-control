@@ -30,7 +30,7 @@
                 </option>
                 @endforeach
             </select> -->
-            
+
 
             <select name="department" id="department"
                 class="border rounded-lg px-3 py-2">
@@ -66,7 +66,7 @@
 
 
 
-            
+
 
             <!-- <button class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2 font-medium">
                 Filter
@@ -82,24 +82,24 @@
             Mark Attendance
         </h2>
 
-        <form id="attendanceForm" method="POST" action="{{ route('admin.attendance.bulkSave') }}"> 
+        <form id="attendanceForm" method="POST" action="{{ route('admin.attendance.bulkSave') }}">
             @csrf
 
             <!-- ACTION BAR -->
             <div class="flex flex-wrap items-center gap-4 mb-5 bg-gray-50 p-4 rounded-xl border">
-    
-    <input type="hidden" name="department" id="hiddenDepartment">
-    <input type="hidden" name="section" id="hiddenSection">
-    <input type="hidden" name="year" id="hiddenYear">
+
+                <input type="hidden" name="department" id="hiddenDepartment">
+                <input type="hidden" name="section" id="hiddenSection">
+                <input type="hidden" name="year" id="hiddenYear">
                 <div>
                     <label class="text-xs text-gray-500 block">Attendance Date</label>
                     <!-- <input type="date" name="date" value="{{ $date }}" -->
-                     <input type="date"
-                    name="date"
-                    value="{{ old('date', now()->format('Y-m-d')) }}"
-                    max="{{ now()->format('Y-m-d') }}"
-                    class="border rounded-lg px-3 py-2 font-semibold"
-                    required>
+                    <input type="date"
+                        name="date"
+                        value="{{ old('date', now()->format('Y-m-d')) }}"
+                        max="{{ now()->format('Y-m-d') }}"
+                        class="border rounded-lg px-3 py-2 font-semibold"
+                        required>
                 </div>
 
                 <!-- <div>
@@ -120,83 +120,89 @@
                 </div>
 
             </div>
-            <!-- SELECTED STUDENTS PREVIEW -->
-            <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-700 mb-2">
-                    Selected Students:
-                    <span id="selectedCount" class="text-indigo-600">0</span>
-                </h3>
+           @if($attendanceExists)
 
-                <div id="selectedPreview"
-                    class="flex flex-wrap gap-2 bg-gray-50 p-3 rounded-lg border min-h-[40px]">
-                </div>
-            </div>
+    <div class="text-center py-10 bg-red-50 border rounded-xl mt-4">
+        <h3 class="text-lg font-semibold text-red-600">
+            Attendance is Locked for this Date
+        </h3>
+        <p class="text-gray-600 mt-2">
+            Present and Absent already marked.
+        </p>
+    </div>
 
+@else
 
-            <!-- STUDENT TABLE -->
-            <div class="overflow-x-auto rounded-xl border">
-                <table class="min-w-full text-sm">
-                    <thead class="bg-gray-100 text-gray-700">
-                        <tr>
-                            <th class="px-4 py-3 text-center">
-                                <input type="checkbox" id="checkAll"
-                                    class="w-4 h-4 rounded border-gray-300">
-                            </th>
-                            <th class="px-4 py-3">Roll No</th>
-                            <th class="px-4 py-3">Name</th>
-                            <th class="px-4 py-3">Year</th>
-                            <th class="px-4 py-3">Department</th>
-                            <th class="px-4 py-3">Section</th>
-                            <th class="px-4 py-3">Status</th>
+    <!-- SELECTED STUDENTS PREVIEW -->
+    <div class="mb-4">
+        <h3 class="text-sm font-semibold text-gray-700 mb-2">
+            Selected Students:
+            <span id="selectedCount" class="text-indigo-600">0</span>
+        </h3>
 
-                        </tr>
-                    </thead>
+        <div id="selectedPreview"
+            class="flex flex-wrap gap-2 bg-gray-50 p-3 rounded-lg border min-h-[40px]">
+        </div>
+    </div>
 
-                    
-  <tbody id="studentsTable" class="divide-y">
-    @if(!request()->hasAny(['department','section','year']))
-        <tr>
-            <td colspan="6" class="text-center py-6 text-gray-400">
-                Please select Department, Section and Year
-            </td>
-        </tr>
-    @else
-        @forelse($students as $student)
-            @php
-                $yearLevel = now()->year - $student->admission_year + 1;
-                $yearLabel = ($yearLevel >= 1 && $yearLevel <= 4)
-                    ? $yearLevel . ' Year'
-                    : 'Passout';
-            @endphp
+    <!-- STUDENT TABLE -->
+    <div class="overflow-x-auto rounded-xl border">
+        <table class="min-w-full text-sm">
+            <thead class="bg-gray-100 text-gray-700">
+                <tr>
+                    <th class="px-4 py-3 text-center">
+                        <input type="checkbox" id="checkAll"
+                            class="w-4 h-4 rounded border-gray-300">
+                    </th>
+                    <th class="px-4 py-3">Roll No</th>
+                    <th class="px-4 py-3">Name</th>
+                    <th class="px-4 py-3">Year</th>
+                    <th class="px-4 py-3">Department</th>
+                    <th class="px-4 py-3">Section</th>
+                    <th class="px-4 py-3">Status</th>
+                </tr>
+            </thead>
 
-            <tr class="hover:bg-indigo-50 transition">
-                <td class="px-4 py-3 text-center">
-                    <input type="checkbox"
-                        value="{{ $student->id }}"
-                        data-name="{{ $student->name }}"
-                        data-department="{{ $student->department->name ?? '-' }}"
-                        data-year="{{ $yearLabel }}"
-                        class="student-check w-4 h-4 rounded border-gray-300">
-                </td>
+            <tbody id="studentsTable" class="divide-y">
+                @forelse($students as $student)
+                    @php
+                        $yearLevel = now()->year - $student->admission_year + 1;
+                        $yearLabel = ($yearLevel >= 1 && $yearLevel <= 4)
+                            ? $yearLevel . ' Year'
+                            : 'Passout';
+                    @endphp
 
-                <td class="px-4 py-3">{{ $student->rollnum }}</td>
-                <td class="px-4 py-3">{{ $student->name }}</td>
-                <td class="px-4 py-3">{{ $yearLabel }}</td>
-                <td class="px-4 py-3">{{ $student->department->name ?? '-' }}</td>
-                <td class="px-4 py-3">{{ $student->section->name ?? '-' }}</td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="6" class="text-center py-4 text-gray-500">
-                    No students found
-                </td>
-            </tr>
-        @endforelse
-    @endif
-</tbody>
+                    <tr class="hover:bg-indigo-50 transition">
+                        <td class="px-4 py-3 text-center">
+                            <input type="checkbox"
+                                value="{{ $student->id }}"
+                                data-name="{{ $student->name }}"
+                                data-department="{{ $student->department->name ?? '-' }}"
+                                data-year="{{ $yearLabel }}"
+                                class="student-check w-4 h-4 rounded border-gray-300">
+                        </td>
 
-                </table>
-            </div>
+                        <td class="px-4 py-3">{{ $student->rollnum }}</td>
+                        <td class="px-4 py-3">{{ $student->name }}</td>
+                        <td class="px-4 py-3">{{ $yearLabel }}</td>
+                        <td class="px-4 py-3">{{ $student->department->name ?? '-' }}</td>
+                        <td class="px-4 py-3">{{ $student->section->name ?? '-' }}</td>
+                    </tr>
+
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-gray-500">
+                            No students found
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+
+        </table>
+    </div>
+
+@endif
+
 
 
         </form>
@@ -260,7 +266,7 @@
 
                 //  Re-check selected students AFTER table reload
                 document.querySelectorAll('.student-check').forEach(cb => {
-                    if (selectedStudents[cb.value]){
+                    if (selectedStudents[cb.value]) {
                         cb.checked = true;
                     }
                 });
@@ -274,7 +280,7 @@
 
     //     attendanceForm.addEventListener('submit', function() {
 
-            
+
     //         let sample = document.querySelectorAll('.hidden-student').forEach(e => e.remove());
     //         console.log(sample, "_____sample");
     //         selectedStudents.forEach(id => {
@@ -294,28 +300,28 @@
 
     attendanceForm.addEventListener('submit', function() {
 
-    // Send filter values
-    document.getElementById('hiddenDepartment').value = department.value;
-    document.getElementById('hiddenSection').value = section.value;
-    document.getElementById('hiddenYear').value = year.value;
+        // Send filter values
+        document.getElementById('hiddenDepartment').value = department.value;
+        document.getElementById('hiddenSection').value = section.value;
+        document.getElementById('hiddenYear').value = year.value;
 
-    // Remove old hidden students
-    document.querySelectorAll('.hidden-student')
-        .forEach(e => e.remove());
+        // Remove old hidden students
+        document.querySelectorAll('.hidden-student')
+            .forEach(e => e.remove());
 
-    // Add selected students
-    Object.keys(selectedStudents).forEach(id => {
+        // Add selected students
+        Object.keys(selectedStudents).forEach(id => {
 
-        let input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'students[]';
-        input.value = id;
-        input.classList.add('hidden-student');
+            let input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'students[]';
+            input.value = id;
+            input.classList.add('hidden-student');
 
-        this.appendChild(input);
+            this.appendChild(input);
+        });
+
     });
-
-});
 
 
 
@@ -393,61 +399,61 @@
     //  Filters
     // department.addEventListener('change', loadStudents);
     search.addEventListener('keyup', () => {
-    clearTimeout(timer);
-    timer = setTimeout(loadStudents, 400);
-});
+        clearTimeout(timer);
+        timer = setTimeout(loadStudents, 400);
+    });
 
-section.addEventListener('change', loadStudents);
-year.addEventListener('change', loadStudents);
+    section.addEventListener('change', loadStudents);
+    year.addEventListener('change', loadStudents);
 
     department.addEventListener('change', function() {
 
-    const deptId = this.value;
+        const deptId = this.value;
 
-    section.innerHTML = '<option>Loading...</option>';
-    section.disabled = true;
-
-    if (!deptId) {
-        section.innerHTML = '<option value="">All Sections</option>';
+        section.innerHTML = '<option>Loading...</option>';
         section.disabled = true;
 
-        loadStudents(); //  reload students when cleared
-        return;
-    }
-
-    fetch(`/admin/departments/${deptId}/sections`)
-        .then(res => res.json())
-        .then(data => {
-
+        if (!deptId) {
             section.innerHTML = '<option value="">All Sections</option>';
+            section.disabled = true;
 
-            data.forEach(sec => {
-                section.innerHTML +=
-                    `<option value="${sec.id}">${sec.name}</option>`;
+            loadStudents(); //  reload students when cleared
+            return;
+        }
+
+        fetch(`/admin/departments/${deptId}/sections`)
+            .then(res => res.json())
+            .then(data => {
+
+                section.innerHTML = '<option value="">All Sections</option>';
+
+                data.forEach(sec => {
+                    section.innerHTML +=
+                        `<option value="${sec.id}">${sec.name}</option>`;
+                });
+
+                section.disabled = false;
+
+                loadStudents(); //  LOAD AFTER sections ready
             });
 
-            section.disabled = false;
+    });
+    search.disabled = true;
 
-            loadStudents(); //  LOAD AFTER sections ready
-        });
+    department.addEventListener('change', function() {
 
-});
-search.disabled = true;
-
-department.addEventListener('change', function () {
-
-    if (this.value) {
-        search.disabled = false;
-    } else {
-        search.disabled = true;
-        document.getElementById('studentsTable').innerHTML =
-            `<tr>
+        if (this.value) {
+            search.disabled = false;
+        } else {
+            search.disabled = true;
+            document.getElementById('studentsTable').innerHTML =
+                `<tr>
                 <td colspan="6" class="text-center py-6 text-gray-400">
                     Please select a filter to view students
                 </td>
             </tr>`;
-    }
-});
+        }
+    });
 
 
     section.addEventListener('change', loadStudents);
@@ -482,32 +488,32 @@ department.addEventListener('change', function () {
     //     document.querySelectorAll('.student-check')
     //         .forEach(cb => cb.checked = this.checked);
     // });
-  document.getElementById('checkAll').addEventListener('change', function() {
+    document.getElementById('checkAll').addEventListener('change', function() {
 
-    document.querySelectorAll('.student-check').forEach(cb => {
+        document.querySelectorAll('.student-check').forEach(cb => {
 
-        cb.checked = this.checked;
+            cb.checked = this.checked;
 
-        const id = cb.value;
+            const id = cb.value;
 
-        if (this.checked) {
+            if (this.checked) {
 
-            selectedStudents[id] = {
-                name: cb.dataset.name,
-                department: cb.dataset.department,
-                year: cb.dataset.year
-            };
+                selectedStudents[id] = {
+                    name: cb.dataset.name,
+                    department: cb.dataset.department,
+                    year: cb.dataset.year
+                };
 
-        } else {
+            } else {
 
-            delete selectedStudents[id];
+                delete selectedStudents[id];
 
-        }
+            }
 
+        });
+
+        updateSelectedPreview();
     });
-
-    updateSelectedPreview();
-});
 
 
 
