@@ -30,6 +30,7 @@
                 </option>
                 @endforeach
             </select> -->
+            
 
             <select name="department" id="department"
                 class="border rounded-lg px-3 py-2">
@@ -39,6 +40,14 @@
                     {{ $dept->name }}
                 </option>
                 @endforeach
+            </select>
+            <select name="year" class="border rounded-lg px-3 py-2">
+                <option value="">All Years</option>
+                @for($i=1;$i<=4;$i++)
+                    <option value="{{ $i }}" @selected(request('year')==$i)>
+                    Year {{ $i }}
+                    </option>
+                    @endfor
             </select>
 
 
@@ -57,14 +66,7 @@
 
 
 
-            <select name="year" class="border rounded-lg px-3 py-2">
-                <option value="">All Years</option>
-                @for($i=1;$i<=4;$i++)
-                    <option value="{{ $i }}" @selected(request('year')==$i)>
-                    Year {{ $i }}
-                    </option>
-                    @endfor
-            </select>
+            
 
             <!-- <button class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2 font-medium">
                 Filter
@@ -85,22 +87,30 @@
 
             <!-- ACTION BAR -->
             <div class="flex flex-wrap items-center gap-4 mb-5 bg-gray-50 p-4 rounded-xl border">
-
+    
+    <input type="hidden" name="department" id="hiddenDepartment">
+    <input type="hidden" name="section" id="hiddenSection">
+    <input type="hidden" name="year" id="hiddenYear">
                 <div>
                     <label class="text-xs text-gray-500 block">Attendance Date</label>
-                    <input type="date" name="date" value="{{ $date }}"
-                        class="border rounded-lg px-3 py-2 font-semibold" required>
+                    <!-- <input type="date" name="date" value="{{ $date }}" -->
+                     <input type="date"
+                    name="date"
+                    value="{{ old('date', now()->format('Y-m-d')) }}"
+                    max="{{ now()->format('Y-m-d') }}"
+                    class="border rounded-lg px-3 py-2 font-semibold"
+                    required>
                 </div>
 
-                <div>
+                <!-- <div>
                     <label class="text-xs text-gray-500 block">Status</label>
-                    <select name="status"
+                    <select 
                         class="border rounded-lg px-4 py-2 font-semibold">
                         <option value="P"> Present</option>
                         <option value="A">Absent</option>
                         <option value="H"> Holiday</option>
                     </select>
-                </div>
+                </div> -->
 
                 <div class="mt-4 md:mt-0">
                     <button type="submit"
@@ -137,20 +147,44 @@
                             <th class="px-4 py-3">Year</th>
                             <th class="px-4 py-3">Department</th>
                             <th class="px-4 py-3">Section</th>
+                            <th class="px-4 py-3">Status</th>
+
                         </tr>
                     </thead>
 
                     
-                    <tbody id="studentsTable" class="divide-y">
-    @if($students->isEmpty() && !request()->hasAny(['search','department','section','year']))
+  <tbody id="studentsTable" class="divide-y">
+    @if(!request()->hasAny(['department','section','year']))
         <tr>
             <td colspan="6" class="text-center py-6 text-gray-400">
-                Please select a filter to view students
+                Please select Department, Section and Year
             </td>
         </tr>
     @else
         @forelse($students as $student)
-            {{-- your row --}}
+            @php
+                $yearLevel = now()->year - $student->admission_year + 1;
+                $yearLabel = ($yearLevel >= 1 && $yearLevel <= 4)
+                    ? $yearLevel . ' Year'
+                    : 'Passout';
+            @endphp
+
+            <tr class="hover:bg-indigo-50 transition">
+                <td class="px-4 py-3 text-center">
+                    <input type="checkbox"
+                        value="{{ $student->id }}"
+                        data-name="{{ $student->name }}"
+                        data-department="{{ $student->department->name ?? '-' }}"
+                        data-year="{{ $yearLabel }}"
+                        class="student-check w-4 h-4 rounded border-gray-300">
+                </td>
+
+                <td class="px-4 py-3">{{ $student->rollnum }}</td>
+                <td class="px-4 py-3">{{ $student->name }}</td>
+                <td class="px-4 py-3">{{ $yearLabel }}</td>
+                <td class="px-4 py-3">{{ $student->department->name ?? '-' }}</td>
+                <td class="px-4 py-3">{{ $student->section->name ?? '-' }}</td>
+            </tr>
         @empty
             <tr>
                 <td colspan="6" class="text-center py-4 text-gray-500">
@@ -215,6 +249,7 @@
             department: department.value,
             section: section.value,
             year: year.value,
+            date: document.querySelector('input[name="date"]').value
         });
 
         fetch(`{{ route('admin.attendance.ajaxStudents') }}?${params}`)
@@ -259,10 +294,16 @@
 
     attendanceForm.addEventListener('submit', function() {
 
+    // Send filter values
+    document.getElementById('hiddenDepartment').value = department.value;
+    document.getElementById('hiddenSection').value = section.value;
+    document.getElementById('hiddenYear').value = year.value;
 
+    // Remove old hidden students
     document.querySelectorAll('.hidden-student')
         .forEach(e => e.remove());
 
+    // Add selected students
     Object.keys(selectedStudents).forEach(id => {
 
         let input = document.createElement('input');
@@ -275,6 +316,7 @@
     });
 
 });
+
 
 
     // function updateSelectedPreview() {

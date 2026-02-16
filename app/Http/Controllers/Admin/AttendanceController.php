@@ -24,35 +24,42 @@ class AttendanceController extends Controller
 
 if ($request->hasAny(['search','department','section','year'])) {
 
-    $students = Student::with('department', 'section')
-        ->whereRaw("(? - admission_year + 1) BETWEEN 1 AND 4", [$currentYear])
-        ->where('passout_year', '>=', $currentYear)
+    $students = Student::with([
+        'department',
+        'section',
+        'attendances' => function ($q) use ($date) {
+            $q->whereDate('date', $date);
+        }
+    ])
+    ->whereRaw("(? - admission_year + 1) BETWEEN 1 AND 4", [$currentYear])
+    ->where('passout_year', '>=', $currentYear)
 
-        ->when($request->search, function ($q) use ($request) {
-            $q->where(function ($sub) use ($request) {
-                $sub->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('rollnum', 'like', "%{$request->search}%");
-            });
-        })
+    ->when($request->search, function ($q) use ($request) {
+        $q->where(function ($sub) use ($request) {
+            $sub->where('name', 'like', "%{$request->search}%")
+                ->orWhere('rollnum', 'like', "%{$request->search}%");
+        });
+    })
 
-        ->when($request->department,
-            fn($q) => $q->where('department_id', $request->department)
-        )
+    ->when($request->department,
+        fn($q) => $q->where('department_id', $request->department)
+    )
 
-        ->when($request->section,
-            fn($q) => $q->where('section_id', $request->section)
-        )
+    ->when($request->section,
+        fn($q) => $q->where('section_id', $request->section)
+    )
 
-        ->when($request->year, function ($q) use ($request, $currentYear) {
-            $q->whereRaw(
-                "(? - admission_year + 1) = ?",
-                [$currentYear, (int)$request->year]
-            );
-        })
+    ->when($request->year, function ($q) use ($request, $currentYear) {
+        $q->whereRaw(
+            "(? - admission_year + 1) = ?",
+            [$currentYear, (int)$request->year]
+        );
+    })
 
-        ->orderBy('rollnum')
-        ->get();
+    ->orderBy('rollnum')
+    ->get();
 }
+
 
 
         // $students = Student::with('department', 'section')
@@ -114,43 +121,46 @@ if ($request->hasAny(['search','department','section','year'])) {
     }
 
     // auto search for all 
-    public function ajaxStudents(Request $request)
-    {
-        $currentYear = now()->year;
+   public function ajaxStudents(Request $request)
+{
+    $currentYear = now()->year;
+    $date = $request->date ?? now()->toDateString();
 
-        $students = Student::with('department', 'section')
-            ->whereRaw("(? - admission_year + 1) BETWEEN 1 AND 4", [$currentYear])
-            ->where('passout_year', '>=', $currentYear)
-            ->when($request->search, function ($q) use ($request) {
-                $q->where(function ($s) use ($request) {
-                    $s->where('name', 'like', "%{$request->search}%")
-                        ->orWhere('rollnum', 'like', "%{$request->search}%");
-                });
-            })
+    $students = collect();
 
-            ->when(
-                $request->department,
-                fn($q) =>
-                $q->where('department_id', $request->department)
-            )
+    if ($request->hasAny(['department','section','year'])) {
 
-            ->when(
-                $request->section,
-                fn($q) =>
-                $q->where('section_id', $request->section)
-            )
+        $students = Student::with([
+            'department',
+            'section',
+            'attendances' => function ($q) use ($date) {
+                $q->whereDate('date', $date);
+            }
+        ])
+        ->whereRaw("(? - admission_year + 1) BETWEEN 1 AND 4", [$currentYear])
+        ->where('passout_year', '>=', $currentYear)
 
-            ->when(
-                $request->year,
-                fn($q) =>
-                $q->whereRaw("(? - admission_year + 1) = ?", [$currentYear, $request->year])
-            )
+        ->when($request->search, function ($q) use ($request) {
+            $q->where(function ($s) use ($request) {
+                $s->where('name', 'like', "%{$request->search}%")
+                  ->orWhere('rollnum', 'like', "%{$request->search}%");
+            });
+        })
 
-            ->orderBy('rollnum')
-            ->get();
+        ->where('department_id', $request->department)
+        ->where('section_id', $request->section)
+        ->whereRaw("(? - admission_year + 1) = ?", [
+            $currentYear,
+            (int)$request->year
+        ])
 
-        return view('admin.attendance.partials.students', compact('students'));
+        ->orderBy('rollnum')
+        ->get();
     }
+
+    return view('admin.attendance.partials.students', compact('students'));
+}
+
 
 
 
@@ -177,52 +187,176 @@ if ($request->hasAny(['search','department','section','year'])) {
     //     return back()->with('success', 'Attendance saved successfully ');
     // }
 
+// current 
+//   public function bulkSave(Request $request)
+// {
+//     $request->validate([
+//         'date'     => 'required|date|before_or_equal:today',
+//         'status'   => 'required|in:P,A,H',
+//         'students' => 'required|array',
+//     ]);
 
-  public function bulkSave(Request $request)
+//     DB::beginTransaction();
+
+//     try {
+
+//         foreach ($request->students as $studentId) {
+
+//             $student = Student::find($studentId);
+
+//             Attendance::updateOrCreate(
+//                 ['student_id' => $studentId, 'date' => $request->date],
+//                 ['status' => $request->status]
+//             );
+
+//             /*
+//             |--------------------------------------------------------------------------
+//             | SEND OTP SMS ONLY IF ABSENT
+//             |--------------------------------------------------------------------------
+//             */
+
+//             if (
+//                 $request->status === 'A' &&
+//                 $student &&
+//                 !empty($student->father_phone)
+//             ) {
+
+//                 $otp = rand(100000, 999999);
+
+//                 // MUST  change temp latter 
+//                 $message = "Please use this OTP {$otp} for your registration. IDLSMS";
+
+//                 SmsService::send($student->father_phone, $message);
+//             }
+//         }
+
+//         DB::commit();
+
+//         return back()->with('success', 'Attendance saved & OTP SMS sent');
+
+//     } catch (\Exception $e) {
+
+//         DB::rollBack();
+
+//         return back()->with('error', $e->getMessage());
+//     }
+// }
+
+// public function bulkSave(Request $request)
+// {
+//     // dd($request->all());
+//     $request->validate([
+//         'date'       => 'required|date|before_or_equal:today',
+//         'department' => 'required',
+//         'section'    => 'required',
+//         'year'       => 'required',
+//     ]);
+
+//     DB::beginTransaction();
+
+//     try {
+
+//         $currentYear = now()->year;
+
+//         // 1️⃣ Get all students in selected filter
+//         $students = Student::where('department_id', $request->department)
+//             ->where('section_id', $request->section)
+//             ->whereRaw("(? - admission_year + 1) = ?", [
+//                 $currentYear,
+//                 (int)$request->year
+//             ])
+//             ->get();
+
+//         // 2️⃣ Selected students = Absent
+//         $absentIds = $request->students ?? [];
+
+//         foreach ($students as $student) {
+
+//             // $status = in_array($student->id, $absentIds)
+//             $status = in_array((string)$student->id, $absentIds)
+
+//                 ? 'A'
+//                 : 'P';
+
+//             Attendance::updateOrCreate(
+//                 [
+//                     'student_id' => $student->id,
+//                     'date'       => $request->date
+//                 ],
+//                 [
+//                     'status' => $status
+//                 ]
+//             );
+
+//             // 3️⃣ Send SMS only for absent
+//             if ($status === 'A' && !empty($student->father_phone)) {
+
+//                 $otp = rand(100000, 999999);
+//                 $message = "Your child is absent today. OTP: {$otp}";
+
+//                 SmsService::send($student->father_phone, $message);
+//             }
+//         }
+
+//         DB::commit();
+
+//         return back()->with('success', 'Attendance saved successfully');
+
+//     } catch (\Exception $e) {
+
+//         DB::rollBack();
+
+//         return back()->with('error', $e->getMessage());
+//     }
+// }
+public function bulkSave(Request $request)
 {
     $request->validate([
-        'date'     => 'required|date',
-        'status'   => 'required|in:P,A,H',
-        'students' => 'required|array',
+        'date'       => 'required|date|before_or_equal:today',
+        'department' => 'required',
+        'section'    => 'required',
+        'year'       => 'required',
     ]);
 
     DB::beginTransaction();
 
     try {
 
-        foreach ($request->students as $studentId) {
+        $currentYear = now()->year;
 
-            $student = Student::find($studentId);
+        $students = Student::where('department_id', $request->department)
+            ->where('section_id', $request->section)
+            ->whereRaw("(? - admission_year + 1) = ?", [
+                $currentYear,
+                (int)$request->year
+            ])
+            ->get();
+
+        // Convert to integer array
+        $absentIds = collect($request->students ?? [])
+                        ->map(fn($id) => (int)$id)
+                        ->toArray();
+
+        foreach ($students as $student) {
+
+            $status = in_array($student->id, $absentIds)
+                ? 'A'
+                : 'P';
 
             Attendance::updateOrCreate(
-                ['student_id' => $studentId, 'date' => $request->date],
-                ['status' => $request->status]
+                [
+                    'student_id' => $student->id,
+                    'date'       => $request->date
+                ],
+                [
+                    'status' => $status
+                ]
             );
-
-            /*
-            |--------------------------------------------------------------------------
-            | SEND OTP SMS ONLY IF ABSENT
-            |--------------------------------------------------------------------------
-            */
-
-            if (
-                $request->status === 'A' &&
-                $student &&
-                !empty($student->father_phone)
-            ) {
-
-                $otp = rand(100000, 999999);
-
-                // MUST  change temp latter 
-                $message = "Please use this OTP {$otp} for your registration. IDLSMS";
-
-                SmsService::send($student->father_phone, $message);
-            }
         }
 
         DB::commit();
 
-        return back()->with('success', 'Attendance saved & OTP SMS sent');
+        return back()->with('success', 'Attendance saved successfully');
 
     } catch (\Exception $e) {
 
