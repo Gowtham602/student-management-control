@@ -86,11 +86,11 @@
                     Student Day Attendance
                 </a>
 
-                <a href="{{ route('admin.attendance.summary') }}"
+                <!-- <a href="{{ route('admin.attendance.summary') }}"
                    class="block px-3 py-2 rounded-lg text-sm transition
                    {{ request()->routeIs('admin.attendance.summary') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
                     Attendance Summary
-                </a>
+                </a> -->
 
             </div>
         </div>
