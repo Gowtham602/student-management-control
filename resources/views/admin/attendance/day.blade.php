@@ -163,25 +163,30 @@
                             </td>
 
                             <!-- STATUS -->
-                            <td class="px-5 py-4 text-center">
-                                @if($status === 'P')
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">
-                                        ● Present
-                                    </span>
-                                @elseif($status === 'A')
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
-                                        ● Absent
-                                    </span>
-                                @elseif($status === 'H')
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700">
-                                        ● Holiday
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-500">
-                                        ● Not Marked
-                                    </span>
-                                @endif
-                            </td>
+                           <td class="px-5 py-4 text-center">
+
+    <form method="POST" action="{{ route('admin.attendance.update') }}">
+        @csrf
+
+        <input type="hidden" name="student_id" value="{{ $student->id }}">
+        <input type="hidden" name="date" value="{{ $date }}">
+
+        <select name="status"
+            onchange="this.form.submit()"
+            class="px-3 py-1 text-xs rounded-full border
+            {{ $status == 'P' ? 'bg-green-100 text-green-700'
+            : ($status == 'A' ? 'bg-red-100 text-red-700'
+            : 'bg-gray-100 text-gray-600') }}">
+
+            <option value="">Not Marked</option>
+            <option value="P" {{ $status=='P' ? 'selected' : '' }}>Present</option>
+            <option value="A" {{ $status=='A' ? 'selected' : '' }}>Absent</option>
+        </select>
+
+    </form>
+
+</td>
+
 
                         </tr>
 

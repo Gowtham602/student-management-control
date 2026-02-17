@@ -138,6 +138,8 @@ public function ajaxStudents(Request $request)
                 $q->whereDate('date', $date);
             }
         ])
+        ->whereRaw("(? - admission_year + 1) BETWEEN 1 AND 4", [$currentYear])   // ADD THIS
+        ->where('passout_year', '>=', $currentYear) 
         ->where('department_id', $request->department)
         ->where('section_id', $request->section)
         ->whereRaw("(? - admission_year + 1) = ?", [
@@ -242,6 +244,37 @@ public function bulkSave(Request $request)
         return back()->with('error', $e->getMessage());
     }
 }
+
+ 
+
+public function update(Request $request)
+{
+    $attendance = Attendance::updateOrCreate(
+        [
+            'student_id' => $request->student_id,
+            'date' => $request->date
+        ],
+        [
+            'status' => $request->status
+        ]
+    );
+
+    //  If Absent → Send OTP
+    if ($request->status == 'A') {
+
+        $otp = rand(100000, 999999);
+
+        $attendance->update([
+            'otp' => $otp
+        ]);
+
+      
+    
+    }
+
+    return back()->with('success', 'Attendance Updated');
+}
+
 
 
     /*
