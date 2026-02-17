@@ -297,32 +297,195 @@
 
     // });
 
-    const attendanceForm = document.getElementById('attendanceForm');
+    // const attendanceForm = document.getElementById('attendanceForm');
 
-    attendanceForm.addEventListener('submit', function() {
+    // attendanceForm.addEventListener('submit', function() {
+    //    //  Department Validation
+    // if (!department.value) {
+    //     e.preventDefault();
+    //     Swal.fire({
+    //         icon: 'warning',
+    //         title: 'Please select Department',
+    //         confirmButtonColor: '#6366f1'
+    //     });
+    //     return;
+    // }
 
-        // Send filter values
-        document.getElementById('hiddenDepartment').value = department.value;
-        document.getElementById('hiddenSection').value = section.value;
-        document.getElementById('hiddenYear').value = year.value;
+    // //  Section Validation
+    // if (!section.value) {
+    //     e.preventDefault();
+    //     Swal.fire({
+    //         icon: 'warning',
+    //         title: 'Please select Section',
+    //         confirmButtonColor: '#6366f1'
+    //     });
+    //     return;
+    // }
 
-        // Remove old hidden students
-        document.querySelectorAll('.hidden-student')
-            .forEach(e => e.remove());
+    // //  Year Validation
+    // if (!year.value) {
+    //     e.preventDefault();
+    //     Swal.fire({
+    //         icon: 'warning',
+    //         title: 'Please select Year',
+    //         confirmButtonColor: '#6366f1'
+    //     });
+    //     return;
+    // }
+    // const attendanceForm = document.getElementById('attendanceForm');
 
-        // Add selected students
-        Object.keys(selectedStudents).forEach(id => {
+// attendanceForm.addEventListener('submit', function(e) {
 
-            let input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'students[]';
-            input.value = id;
-            input.classList.add('hidden-student');
+//     if (!department.value) {
+//         e.preventDefault();
+//         Swal.fire({
+//             icon: 'warning',
+//             title: 'Please select Department',
+//             confirmButtonColor: '#6366f1'
+//         });
+//         return;
+//     }
 
-            this.appendChild(input);
+//     if (!section.value) {
+//         e.preventDefault();
+//         Swal.fire({
+//             icon: 'warning',
+//             title: 'Please select Section',
+//             confirmButtonColor: '#6366f1'
+//         });
+//         return;
+//     }
+
+//     if (!year.value) {
+//         e.preventDefault();
+//         Swal.fire({
+//             icon: 'warning',
+//             title: 'Please select Year',
+//             confirmButtonColor: '#6366f1'
+//         });
+//         return;
+//     }
+
+//     // Send filter values
+//     document.getElementById('hiddenDepartment').value = department.value;
+//     document.getElementById('hiddenSection').value = section.value;
+//     document.getElementById('hiddenYear').value = year.value;
+
+//     document.querySelectorAll('.hidden-student').forEach(el => el.remove());
+
+//     Object.keys(selectedStudents).forEach(id => {
+//         let input = document.createElement('input');
+//         input.type = 'hidden';
+//         input.name = 'students[]';
+//         input.value = id;
+//         input.classList.add('hidden-student');
+//         this.appendChild(input);
+//     });
+
+// });
+const attendanceForm = document.getElementById('attendanceForm');
+
+attendanceForm.addEventListener('submit', function (e) {
+
+    e.preventDefault(); // Stop default submit
+
+    // 🔹 Validate Filters
+    if (!department.value) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Please select Department'
         });
+        return;
+    }
+
+    if (!section.value) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Please select Section'
+        });
+        return;
+    }
+
+    if (!year.value) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Please select Year'
+        });
+        return;
+    }
+
+    let absentCount = Object.keys(selectedStudents).length;
+
+    Swal.fire({
+        title: 'Confirm Attendance',
+        html: `
+            <div style="text-align:left">
+                <p><b>Absent Students:</b> ${absentCount}</p>
+                <p><b>Present Students:</b> Remaining students</p>
+                <br>
+                <p>Are you sure you want to mark remaining students as <b>Present</b>?</p>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#16a34a',
+        cancelButtonColor: '#ef4444',
+        confirmButtonText: 'Yes, Confirm',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            // Send filter values
+            document.getElementById('hiddenDepartment').value = department.value;
+            document.getElementById('hiddenSection').value = section.value;
+            document.getElementById('hiddenYear').value = year.value;
+
+            // Remove old hidden students
+            document.querySelectorAll('.hidden-student')
+                .forEach(el => el.remove());
+
+            // Add selected students (ABSENT)
+            Object.keys(selectedStudents).forEach(id => {
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'students[]';
+                input.value = id;
+                input.classList.add('hidden-student');
+                attendanceForm.appendChild(input);
+            });
+
+            attendanceForm.submit(); //  Final submit
+        }
 
     });
+
+});
+
+
+
+        // // Send filter values
+        // document.getElementById('hiddenDepartment').value = department.value;
+        // document.getElementById('hiddenSection').value = section.value;
+        // document.getElementById('hiddenYear').value = year.value;
+
+        // // Remove old hidden students
+        // document.querySelectorAll('.hidden-student')
+        //     .forEach(e => e.remove());
+
+        // // Add selected students
+        // Object.keys(selectedStudents).forEach(id => {
+
+        //     let input = document.createElement('input');
+        //     input.type = 'hidden';
+        //     input.name = 'students[]';
+        //     input.value = id;
+        //     input.classList.add('hidden-student');
+
+        //     this.appendChild(input);
+        // });
+
+    // });
 
 
 
