@@ -18,9 +18,7 @@
             <!-- <input type="date" name="date" value="{{ $date }}"
                    class="border rounded-lg px-3 py-2"> -->
 
-            <input type="text" name="search" value="{{ request('search') }}"
-                placeholder="Search name / roll"
-                class="border rounded-lg px-3 py-2">
+          
 
             <!-- <select name="department" class="border rounded-lg px-3 py-2">
                 <option value="">All Departments</option>
@@ -63,6 +61,9 @@
                 class="border rounded-lg px-3 py-2" disabled>
                 <option value="">Select Department First</option>
             </select>
+              <input type="text" name="search" value="{{ request('search') }}"
+                placeholder="Search name / roll"
+                class="border rounded-lg px-3 py-2">
 
 
 

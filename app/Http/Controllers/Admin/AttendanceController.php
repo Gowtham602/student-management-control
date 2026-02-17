@@ -146,6 +146,14 @@ public function ajaxStudents(Request $request)
             $currentYear,
             (int)$request->year
         ])
+
+        // search 
+        ->when($request->search, function ($q) use ($request) {
+            $q->where(function ($sub) use ($request) {
+                $sub->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('rollnum', 'like', "%{$request->search}%");
+            });
+        })
         ->orderBy('rollnum')
         ->get();
 
