@@ -222,22 +222,54 @@ public function bulkSave(Request $request)
                         ->map(fn($id) => (int)$id)
                         ->toArray();
 
+        // foreach ($students as $student) {
+
+        //     $status = in_array($student->id, $absentIds)
+        //         ? 'A'
+        //         : 'P';
+
+        //     Attendance::updateOrCreate(
+        //         [
+        //             'student_id' => $student->id,
+        //             'date'       => $request->date
+        //         ],
+        //         [
+        //             'status' => $status
+        //         ]
+        //     );
+        // }
         foreach ($students as $student) {
 
-            $status = in_array($student->id, $absentIds)
-                ? 'A'
-                : 'P';
+    $status = in_array($student->id, $absentIds)
+        ? 'A'
+        : 'P';
 
-            Attendance::updateOrCreate(
-                [
-                    'student_id' => $student->id,
-                    'date'       => $request->date
-                ],
-                [
-                    'status' => $status
-                ]
-            );
-        }
+    $otp = null;
+
+    if ($status === 'A') {
+        $otp = rand(100000, 999999);
+    }
+
+    $attendance = Attendance::updateOrCreate(
+        [
+            'student_id' => $student->id,
+            'date'       => $request->date
+        ],
+        [
+            'status' => $status,
+            'otp'    => $otp
+        ]
+    );
+
+    // Send SMS only if Absent
+    if ($status === 'A' && !empty($student->father_phone)) {
+
+        $message = "Please use this OTP {$otp} for absence confirmation. IDLSMS";
+
+        SmsService::send($student->father_phone, $message);
+    }
+}
+
 
         
 
@@ -255,36 +287,82 @@ public function bulkSave(Request $request)
 
  
 
-public function update(Request $request)
-{
-    $attendance = Attendance::updateOrCreate(
-        [
-            'student_id' => $request->student_id,
-            'date' => $request->date
-        ],
-        [
-            'status' => $request->status
-        ]
-    );
+// public function update(Request $request)
+// {
+//     $attendance = Attendance::updateOrCreate(
+//         [
+//             'student_id' => $request->student_id,
+//             'date' => $request->date
+//         ],
+//         [
+//             'status' => $request->status
+//         ]
+//     );
 
-    //  If Absent → Send OTP
-    if ($request->status == 'A') {
+//     //  If Absent → Send OTP
+//     if ($request->status == 'A') {
 
-        $otp = rand(100000, 999999);
+//         $otp = rand(100000, 999999);
 
-        $attendance->update([
-            'otp' => $otp
-        ]);
+//         $attendance->update([
+//             'otp' => $otp
+//         ]);
 
       
     
+//     }
+
+//     return back()->with('success', 'Attendance Updated');
+// }
+
+public function update(Request $request)
+{
+    DB::beginTransaction();
+
+    try {
+
+        $attendance = Attendance::updateOrCreate(
+            [
+                'student_id' => $request->student_id,
+                'date'       => $request->date
+            ],
+            [
+                'status' => $request->status
+            ]
+        );
+
+        // If Absent → Generate OTP + Send SMS
+        if ($request->status === 'A') {
+
+            $student = Student::find($request->student_id);
+
+            if ($student && !empty($student->father_phone)) {
+
+                $otp = rand(100000, 999999);
+
+                // Save OTP
+                $attendance->update([
+                    'otp' => $otp
+                ]);
+
+                $message = "Please use this OTP {$otp} for absence confirmation. IDLSMS";
+
+                SmsService::send($student->father_phone, $message);
+            }
+        }
+
+        DB::commit();
+
+        return back()->with('success', 'Attendance Updated');
+
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+
+        return back()->with('error', $e->getMessage());
     }
 
-    return back()->with('success', 'Attendance Updated');
 }
-
-
-
     /*
     |--------------------------------------------------------------------------
     | Day-wise Attendance

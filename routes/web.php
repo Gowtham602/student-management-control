@@ -10,7 +10,13 @@ use App\Http\Controllers\Admin\{
     AttendanceController
 };
 
-Route::get('/', fn () => view('welcome'));
+// Route::get('/', fn () => view('welcome'));
+
+
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
 
 require __DIR__.'/auth.php';
 
