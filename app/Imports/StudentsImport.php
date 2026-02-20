@@ -32,6 +32,11 @@ class StudentsImport implements
     {
         $row = array_map('trim', array_change_key_case($row, CASE_LOWER));
 
+
+         $gender = strtolower(trim($row['gender'] ?? ''));
+        if (!in_array($gender, ['male', 'female', 'other'])) {
+        $gender = null;
+        }
         //  Find department by CODE (CSE, ECE, MECH)
         $department = Department::where('code', $row['department'])->first();
 
@@ -52,15 +57,16 @@ class StudentsImport implements
             ['rollnum' => $row['rollnum']],
             [
                 'name'           => $row['name'],
-                'email'          => $row['email'],
-                'gender'         => $row['gender'],
-                'phone'          => $row['phone'],
+                'email'          => $row['email'] ?? null,
+                // 'gender'         => $row['gender'] ?? null,
+                'gender'         => $gender,
+                'phone'          => $row['phone'] ?? null,
                 'blood_group'    => $row['blood_group'] ?? null,
                 'father_phone'   => $row['father_phone'],
 
                 //  RELATIONAL SAVE
                 'department_id'  => $department->id,
-                'section_id'     => $section->id,
+                'section_id'     => $section->id ,
 
                 'admission_year'=> $row['admission_year'],
                 'passout_year'  => $row['passout_year'],
@@ -79,9 +85,13 @@ class StudentsImport implements
         return [
             '*.rollnum' => 'required|distinct',
             '*.name' => 'required|min:3',
-            '*.email' => 'required|email',
-            '*.gender' => 'required|in:male,female,other',
-            '*.phone' => 'required|digits:10',
+            // '*.email' => 'required|email',
+            // '*.gender' => 'required|in:male,female,other',
+            // '*.phone' => 'required|digits:10',
+            // Optional fields (validate only if value exists)
+            '*.email'          => 'nullable|email',
+            '*.gender'         => 'nullable|in:male,female,other',
+            '*.phone'          => 'nullable|digits:10',
             '*.father_phone' => 'required|digits:10',
             '*.department' => 'required',
             '*.section' => 'required',

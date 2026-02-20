@@ -63,7 +63,7 @@
     <div class="bg-indigo-100 p-4 rounded-xl shadow">
         <h3 class="text-sm text-gray-600">Total Students</h3>
         <p class="text-2xl font-bold text-indigo-700">
-            {{ $students->count() }}
+            {{ $students->total() }}
         </p>
     </div>
 
@@ -223,7 +223,7 @@
 
     @if(request()->filled(['department','section','year']))
         <div class="mt-4">
-            <!-- {{ $students->links() }} -->
+            {{ $students->links() }}
         </div>
     @endif
 
