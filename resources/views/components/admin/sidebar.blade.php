@@ -61,38 +61,51 @@
         {{-- Attendance (Active when any attendance page) --}}
         <div class="mt-2">
 
-            <div class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium
-                {{ request()->routeIs('admin.attendance.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700' }}">
-               
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+           {{-- Attendance Dropdown --}}
+{{-- Attendance Dropdown --}}
+<div class="mt-2">
+
+    <button onclick="toggleAttendance()"
+        class="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg font-medium transition
+        {{ request()->routeIs('admin.attendance.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-indigo-50' }}">
+
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            Attendance
+        </div>
+
+        <svg id="attendanceArrow"
+             class="w-4 h-4 transition-transform duration-200"
+             fill="none" stroke="currentColor" stroke-width="2"
              viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  d="M19 9l-7 7-7-7"/>
         </svg>
-                Attendance
-            </div>
+    </button>
 
-            <div class="ml-6 mt-1 space-y-1">
+    <div id="attendanceMenu"
+         class="ml-6 mt-1 space-y-1 hidden">
 
-                <a href="{{ route('admin.attendance.index') }}"
-                   class="block px-3 py-2 rounded-lg text-sm transition
-                   {{ request()->routeIs('admin.attendance.index') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
-                    Bulk Attendance
-                </a>
+        <a href="{{ route('admin.attendance.index') }}"
+           class="block px-3 py-2 rounded-lg text-sm transition
+           {{ request()->routeIs('admin.attendance.index') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
+            Bulk Attendance
+        </a>
 
-                <a href="{{ route('admin.attendance.day') }}"
-                   class="block px-3 py-2 rounded-lg text-sm transition
-                   {{ request()->routeIs('admin.attendance.day') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
-                    Student Day Attendance
-                </a>
+        <a href="{{ route('admin.attendance.day') }}"
+           class="block px-3 py-2 rounded-lg text-sm transition
+           {{ request()->routeIs('admin.attendance.day') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
+            Student Day Attendance
+        </a>
 
-                <!-- <a href="{{ route('admin.attendance.summary') }}"
-                   class="block px-3 py-2 rounded-lg text-sm transition
-                   {{ request()->routeIs('admin.attendance.summary') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
-                    Attendance Summary
-                </a> -->
+    </div>
+</div>
 
-            </div>
+
         </div>
         
 
@@ -104,3 +117,29 @@
     </div>
 
 </div>
+<script>
+    function toggleAttendance() {
+        const menu = document.getElementById('attendanceMenu');
+        const arrow = document.getElementById('attendanceArrow');
+
+        menu.classList.toggle('hidden');
+        arrow.classList.toggle('rotate-180');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {    
+        const menu = document.getElementById('attendanceMenu');
+        const arrow = document.getElementById('attendanceArrow');
+
+        // Only open automatically if on attendance route
+        const isAttendancePage = {{ request()->routeIs('admin.attendance.*') ? 'true' : 'false' }};
+
+        if (isAttendancePage) {
+            menu.classList.remove('hidden');
+            arrow.classList.add('rotate-180');
+        } else {
+            menu.classList.add('hidden');
+            arrow.classList.remove('rotate-180');
+        }
+    });
+</script>
+
