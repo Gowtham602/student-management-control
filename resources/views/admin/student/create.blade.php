@@ -183,115 +183,131 @@
 </div>
 @push('scripts')
 <script>
-    $(function() {
+$(document).ready(function () {
 
-        $("#studentForm").validate({
-            rules: {
-                name: {
-                    required: true,
-                    minlength: 3
-                },
-                email: {
-                    required: true,
-                    email: true
-                },
-                gender: {
-                    required: true
-                },
-                rollnum: {
-                    required: true
-                },
-                phone: {
-                    required: true,
-                    digits: true,
-                    minlength: 10,
-                    maxlength: 10
-                },
-                father_phone: {
-                    required: true,
-                    digits: true,
-                    minlength: 10,
-                    maxlength: 10
-                },
-                department_id: {
-                    required: true
-                },
-                section_id: {
-                    required: true
-                },
-                year: {
-                    required: true
-                },
-                passout_year: {
-                    required: true
-                }
+    $("#studentForm").validate({
 
+        errorElement: "p",
+        errorClass: "error text-red-500 text-xs mt-1",
+
+        rules: {
+            name: {
+                required: true,
+                minlength: 3
             },
-            submitHandler: function(form) {
+            email: {
+                email: true   // optional but validate format
+            },
+            rollnum: {
+                required: true
+            },
+            father_phone: {
+                required: true,
+                digits: true,
+                minlength: 10,
+                maxlength: 10
+            },
+            department_id: {
+                required: true
+            },
+            section_id: {
+                required: true
+            },
+            admission_year: {
+                required: true,
+                digits: true
+            },
+            passout_year: {
+                required: true,
+                digits: true
+            }
+        },
 
-                let formData = new FormData(form);
+        submitHandler: function (form) {
 
-                $.ajax({
-                    url: form.action,
-                    method: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(res) {
+            let formData = new FormData(form);
 
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: 'Student added successfully',
-                            showConfirmButton: false,
-                            timer: 3000
-                        });
+            $.ajax({
+                url: form.action,
+                method: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
 
-                        form.reset();
-                    },
-                    error: function(xhr) {
+                success: function (res) {
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Student added successfully',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+
+                    form.reset();
+                    $('#section').prop('disabled', true)
+                                 .html('<option value="">Select Section</option>');
+                },
+
+                error: function (xhr) {
+
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
 
                         let errors = xhr.responseJSON.errors;
 
-                        $(".error").remove();
+                        $("#studentForm .error").remove();
 
-                        $.each(errors, function(key, value) {
-                            let input = $(`[name="${key}"]`);
-                            input.after(`<p class="error text-red-500 text-xs mt-1">${value[0]}</p>`);
+                        $.each(errors, function (key, value) {
+                            let input = $('[name="' + key + '"]');
+                            input.after('<p class="error text-red-500 text-xs mt-1">' + value[0] + '</p>');
                         });
                     }
-                });
+                }
+            });
 
-                return false;
-            }
-        });
-
+            return false;
+        }
     });
 
-    // on change for department 
-    $('#department').change(function() {
+    //  Auto remove error while typing or changing
+    $(document).on('keyup change', '#studentForm input, #studentForm select', function () {
+        if ($(this).valid()) {
+            $(this).next('.error').remove();
+        }
+    });
+
+    // Load sections when department changes
+    $('#department').change(function () {
+
         let deptId = $(this).val();
 
-        $('#section').prop('disabled', true)
-            .html('<option>Loading...</option>');
+        if (!deptId) {
+            $('#section').prop('disabled', true)
+                         .html('<option value="">Select Section</option>');
+            return;
+        }
 
-        $.get('/admin/departments/' + deptId + '/sections', function(data) {
+        $('#section').prop('disabled', true)
+                     .html('<option>Loading...</option>');
+
+        $.get('/admin/departments/' + deptId + '/sections', function (data) {
 
             $('#section').empty()
-                .append('<option value="">Select Section</option>')
-                .prop('disabled', false);
+                         .append('<option value="">Select Section</option>')
+                         .prop('disabled', false);
 
-            data.forEach(section => {
+            data.forEach(function (section) {
                 $('#section').append(
-                    `<option value="${section.id}">${section.name}</option>`
+                    '<option value="' + section.id + '">' + section.name + '</option>'
                 );
             });
         });
     });
+
+});
 </script>
 @endpush
-
 
 
 

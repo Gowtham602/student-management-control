@@ -15,10 +15,10 @@ class StoresStudentRequest extends FormRequest
     {
         return [
             'name'           => 'required|string|min:3',
-            'email'          => 'required|email|unique:students,email',
-            'gender'         => 'required|in:male,female,other',
+            'email'          => 'nullable|email|unique:students,email',
+            'gender'         => 'nullable|in:male,female,other',
             'rollnum'        => 'required|string|unique:students,rollnum',
-            'phone'          => 'required|digits:10',
+            'phone'          => 'nullable|digits:10',
             'father_phone'   => 'required|digits:10',
             'department_id' => 'required|exists:departments,id',
             'section_id' => 'required|exists:sections,id',

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatedStudentRequest extends FormRequest
 {
@@ -23,10 +24,17 @@ class UpdatedStudentRequest extends FormRequest
     {
         return [
         'name'          => 'required|string|min:3',
-        'email'         => 'required|email|unique:students,email,' . $this->student->id,
-        'gender'        => 'required',
-        'rollnum'       => 'required|unique:students,rollnum,' . $this->student->id,
-        'phone'         => 'required|digits:10',
+        'email' => [
+    'nullable',
+    'email',
+    Rule::unique('students', 'email')->ignore($this->route('student')->id),
+],
+        'gender' => 'nullable|in:male,female,other',
+      'rollnum' => [
+    'required',
+    Rule::unique('students', 'rollnum')->ignore($this->route('student')->id),
+],
+        'phone'         => 'nullable|digits:10',
         'father_phone'  => 'required|digits:10',
          'department_id' => 'required|exists:departments,id',
             'section_id' => 'required|exists:sections,id',

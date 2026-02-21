@@ -313,6 +313,12 @@ public function index(Request $request)
     // dd("hi");
         $student->update($request->validated());
     // dd($student);
+        if ($request->ajax()) {
+        return response()->json([
+            'status' => true,
+            'redirect' => route('admin.students.index')
+        ]);
+    }
         return redirect()
             ->route('admin.students.index')
             ->with('success', 'Student updated successfully');

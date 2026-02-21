@@ -44,11 +44,15 @@
     </div>
 </div>
 
-{{-- Global JS (once) --}}
+
+{{-- Global JS --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/jquery.validation/1.19.5/jquery.validate.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+@stack('scripts')
 
 {{-- Page-specific JS --}}
 @stack('scripts')

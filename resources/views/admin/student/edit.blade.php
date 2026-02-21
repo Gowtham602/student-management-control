@@ -177,14 +177,15 @@ $(function () {
     $("#studentEditForm").validate({
         rules: {
             name: { required: true, minlength: 3 },
-            email: { required: true, email: true },
-            gender: { required: true },
+            email: { email: true },
+            // gender: { required: true },
             rollnum: { required: true },
-            phone: { required: true, digits: true, minlength: 10, maxlength: 10 },
+            // phone: { required: true, digits: true, minlength: 10, maxlength: 10 },
             father_phone: { required: true, digits: true, minlength: 10, maxlength: 10 },
-            department: { required: true },
-            section: { required: true },
-            academic_year: { required: true },
+           department_id: { required: true },
+            section_id: { required: true },
+
+           admission_year: { required: true },
             passout_year: { required: true }
         },
 
@@ -199,7 +200,7 @@ $(function () {
                 processData: false,
                 contentType: false,
 
-                success: function () {
+                success: function (res) {
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
@@ -208,6 +209,9 @@ $(function () {
                         showConfirmButton: false,
                         timer: 3000
                     });
+                    setTimeout(function () {
+                        window.location.href = res.redirect;
+                    }, 1500);
                 },
 
                 error: function (xhr) {
