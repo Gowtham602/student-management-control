@@ -264,7 +264,8 @@ public function bulkSave(Request $request)
     // Send SMS only if Absent
     if ($status === 'A' && !empty($student->father_phone)) {
 
-        $message = "Please use this OTP {$otp} for absence confirmation. IDLSMS";
+        // $message = "Please use this OTP {$otp} for absence confirmation. IDLSMS";
+        $message = "{$otp} Please use this OTP {$otp} for your registration.IDLSMS";
 
         SmsService::send($student->father_phone, $message);
     }
@@ -345,7 +346,9 @@ public function update(Request $request)
                     'otp' => $otp
                 ]);
 
-                $message = "Please use this OTP {$otp} for absence confirmation. IDLSMS";
+                //  message || ${otp} Please use this OTP ${otp} for your registration.IDLSMS,
+                $message = "{$otp} Please use this OTP {$otp} for your registration.IDLSMS";
+                // $message = "Please use this OTP {$otp} for absence confirmation. IDLSMS";
 
                 SmsService::send($student->father_phone, $message);
             }
