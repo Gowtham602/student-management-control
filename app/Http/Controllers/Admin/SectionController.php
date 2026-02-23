@@ -12,7 +12,13 @@ class SectionController extends Controller
 {
    public function index()
     {
-    $sections = Section::with('department')->latest()->get();
+    $sections = Section::with('department')
+    ->join('departments', 'sections.department_id', '=', 'departments.id')
+    ->orderBy('departments.name')
+    ->orderBy('sections.name')
+    ->select('sections.*')
+    // ->get();
+     dd($query->toSql(), $query->getBindings());
     return view('admin.sections.index', compact('sections'));
     }
 
@@ -70,3 +76,4 @@ class SectionController extends Controller
         return back()->with('success','Imported successfully');
     }
 }
+

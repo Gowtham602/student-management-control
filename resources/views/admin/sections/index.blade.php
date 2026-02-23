@@ -13,8 +13,8 @@
         </h2>
 
         <a href="{{ route('admin.sections.create') }}"
-           class="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-             Add Section
+            class="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+            Add Section
         </a>
     </div>
 
@@ -25,25 +25,50 @@
                 <tr>
                     <th class="px-6 py-4">Department</th>
                     <th class="px-6 py-4">Section Name</th>
+                    <th class="px-6 py-4 text-center">Action</th>
                 </tr>
             </thead>
 
             <tbody class="divide-y">
                 @forelse($sections as $s)
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 font-medium text-gray-800">
-                            {{ $s->department->name }}
-                        </td>
-                        <td class="px-6 py-4">
-                            {{ $s->name }}
-                        </td>
-                    </tr>
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 font-medium text-gray-800">
+                        {{ $s->department->name }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ $s->name }}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex justify-center gap-2">
+
+                            <!-- Edit -->
+                            <!-- <a href="{{ route('admin.sections.edit', $s->id) }}"
+           class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-xs">
+            Edit
+        </a> -->
+
+                            <!-- Delete -->
+                            <form action="{{ route('admin.sections.destroy', $s->id) }}"
+                                method="POST"
+                                onsubmit="return confirm('Are you sure to delete this section?')">
+                                @csrf
+                                @method('DELETE')
+
+                                <button type="submit"
+                                    class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs">
+                                    Delete
+                                </button>
+                            </form>
+
+                        </div>
+                    </td>
+                </tr>
                 @empty
-                    <tr>
-                        <td colspan="2" class="px-6 py-6 text-center text-gray-500">
-                            No sections found
-                        </td>
-                    </tr>
+                <tr>
+                    <td colspan="2" class="px-6 py-6 text-center text-gray-500">
+                        No sections found
+                    </td>
+                </tr>
                 @endforelse
             </tbody>
         </table>
