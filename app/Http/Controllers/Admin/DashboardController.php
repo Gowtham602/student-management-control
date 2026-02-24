@@ -46,13 +46,15 @@ class DashboardController extends Controller
             : 0;
 
         // Students by Year
-        $currentYear = now()->year;
+        // $currentYear = now()->year;
+        $now = now();
+        $academicYear = Student::academicYear();
 
         $yearCounts = [
-            '1st' => Student::whereRaw("? - admission_year + 1 = 1", [$currentYear])->count(),
-            '2nd' => Student::whereRaw("? - admission_year + 1 = 2", [$currentYear])->count(),
-            '3rd' => Student::whereRaw("? - admission_year + 1 = 3", [$currentYear])->count(),
-            '4th' => Student::whereRaw("? - admission_year + 1 = 4", [$currentYear])->count(),
+            '1st' => Student::where('admission_year', $academicYear)->count(),
+            '2nd' => Student::where('admission_year', $academicYear - 1)->count(),
+            '3rd' => Student::where('admission_year', $academicYear - 2)->count(),
+            '4th' => Student::where('admission_year', $academicYear - 3)->count(),
         ];
 
         // Recent Students

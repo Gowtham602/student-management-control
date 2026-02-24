@@ -63,6 +63,7 @@ class Student extends Model
     }
 
     $now = now();
+    
 
     // Academic year starts in July
     $academicYear = ($now->month >= 7) ? $now->year : $now->year - 1;
@@ -84,6 +85,12 @@ class Student extends Model
         3 => 'Final Year',
         default => 'N/A',
     };
+}
+
+public static function academicYear()
+{
+    $now = now();
+    return ($now->month >= 7) ? $now->year : $now->year - 1;
 }
      public function department()
     {

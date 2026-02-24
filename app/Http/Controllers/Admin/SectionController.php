@@ -17,8 +17,8 @@ class SectionController extends Controller
     ->orderBy('departments.name')
     ->orderBy('sections.name')
     ->select('sections.*')
-    // ->get();
-     dd($query->toSql(), $query->getBindings());
+    ->get();
+    //  dd($query->toSql(), $query->getBindings());
     return view('admin.sections.index', compact('sections'));
     }
 
