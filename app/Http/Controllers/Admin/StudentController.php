@@ -127,13 +127,77 @@ class StudentController extends Controller
 //     ]);
 // }
 
+// public function index(Request $request)
+// {
+//     // dd($request);
+//     $currentYear = now()->year;
+
+//     $students = Student::with('department','section')
+
+//         ->when($request->search, function ($q) use ($request) {
+//             $q->where(function ($sub) use ($request) {
+//                 $sub->where('name','like',"%{$request->search}%")
+//                     ->orWhere('email','like',"%{$request->search}%")
+//                     ->orWhere('rollnum','like',"%{$request->search}%");
+//             });
+//         })
+
+//         ->when($request->department, fn($q) =>
+//             $q->where('department_id', $request->department)
+//         )
+
+//         ->when($request->section, fn($q) =>
+//             $q->where('section_id', $request->section)
+//         )
+
+//         /*  YEAR FILTER (WORKS AGAIN) */
+//         ->when($request->year, function ($q) use ($request, $currentYear) {
+
+//             if ($request->year == 'passout') {
+//                 $q->where('passout_year', '<', $currentYear);
+//             } else {
+//                 $q->whereRaw(
+//                     "(? - admission_year + 1) = ?",
+//                     [$currentYear, $request->year]
+//                 );
+//             }
+//         })
+
+//         /*  AUTO SORT BY YEAR LEVEL */
+//         ->orderByRaw("
+//             CASE
+//                 WHEN ? > passout_year THEN 5
+//                 ELSE (? - admission_year + 1)
+//             END ASC
+//         ", [$currentYear, $currentYear])
+
+//         ->orderBy('name')
+
+//         ->paginate(10)
+//         ->withQueryString();
+
+//     if ($request->ajax()) {
+//         return view('admin.student.partials.table', compact('students'))->render();
+//     }
+
+//     return view('admin.student.index', [
+//         'students' => $students,
+//         'departments' => Department::orderBy('name')->get(),
+//         'sections' => Section::orderBy('name')->get(),
+//     ]);
+// }
+
+
 public function index(Request $request)
 {
-    // dd($request);
-    $currentYear = now()->year;
+    $now = now();
+
+    // Academic year starts in July
+    $academicYear = ($now->month >= 7) ? $now->year : $now->year - 1;
 
     $students = Student::with('department','section')
 
+        // SEARCH
         ->when($request->search, function ($q) use ($request) {
             $q->where(function ($sub) use ($request) {
                 $sub->where('name','like',"%{$request->search}%")
@@ -142,34 +206,34 @@ public function index(Request $request)
             });
         })
 
+        // DEPARTMENT FILTER
         ->when($request->department, fn($q) =>
             $q->where('department_id', $request->department)
         )
 
+        // SECTION FILTER
         ->when($request->section, fn($q) =>
             $q->where('section_id', $request->section)
         )
 
-        /*  YEAR FILTER (WORKS AGAIN) */
-        ->when($request->year, function ($q) use ($request, $currentYear) {
+        // YEAR FILTER (ACADEMIC BASED)
+        ->when($request->year, function ($q) use ($request, $academicYear) {
 
             if ($request->year == 'passout') {
-                $q->where('passout_year', '<', $currentYear);
+                $q->where('passout_year', '<=', $academicYear);
             } else {
-                $q->whereRaw(
-                    "(? - admission_year + 1) = ?",
-                    [$currentYear, $request->year]
-                );
+                $targetAdmissionYear = $academicYear - ($request->year - 1);
+                $q->where('admission_year', $targetAdmissionYear);
             }
         })
 
-        /*  AUTO SORT BY YEAR LEVEL */
+        // SORT BY STUDY YEAR PROPERLY
         ->orderByRaw("
             CASE
                 WHEN ? > passout_year THEN 5
-                ELSE (? - admission_year + 1)
+                ELSE (? - admission_year)
             END ASC
-        ", [$currentYear, $currentYear])
+        ", [$academicYear, $academicYear])
 
         ->orderBy('name')
 
@@ -186,9 +250,6 @@ public function index(Request $request)
         'sections' => Section::orderBy('name')->get(),
     ]);
 }
-
-
-
 // public function index(Request $request)
 // {
 //     $currentYear = now()->year;

@@ -28,33 +28,63 @@ class Student extends Model
     ];
 
     // AUTO CURRENT STUDY YEAR 
+    // public function getStudyYearAttribute(): string
+    // {
+    //     if (!$this->admission_year || !$this->passout_year) {
+    //         return 'N/A';
+    //     }
+
+    //     $currentYear = now()->year;  
+
+    //     if ($currentYear < $this->admission_year) {
+    //         return 'Not Started';
+    //     }
+
+    //     if ($currentYear > $this->passout_year) {
+    //         return 'Passed Out';
+    //     }
+
+    //     $year = ($currentYear - $this->admission_year) + 1;
+
+    //     return match ($year) {
+    //         1 => '1st Year',
+    //         2 => '2nd Year',
+    //         3 => '3rd Year',
+    //         4 => 'Final Year',
+    //         default => 'Passed Out',
+    //     };
+    // }
+
+
     public function getStudyYearAttribute(): string
-    {
-        if (!$this->admission_year || !$this->passout_year) {
-            return 'N/A';
-        }
-
-        $currentYear = now()->year;  
-
-        if ($currentYear < $this->admission_year) {
-            return 'Not Started';
-        }
-
-        if ($currentYear > $this->passout_year) {
-            return 'Passed Out';
-        }
-
-        $year = ($currentYear - $this->admission_year) + 1;
-
-        return match ($year) {
-            1 => '1st Year',
-            2 => '2nd Year',
-            3 => '3rd Year',
-            4 => 'Final Year',
-            default => 'Passed Out',
-        };
+{
+    if (!$this->admission_year) {
+        return 'N/A';
     }
 
+    $now = now();
+
+    // Academic year starts in July
+    $academicYear = ($now->month >= 7) ? $now->year : $now->year - 1;
+
+    $yearDifference = $academicYear - $this->admission_year;
+
+    if ($yearDifference < 0) {
+        return 'Not Started';
+    }
+
+    if ($yearDifference >= 4) {
+        return 'Passed Out';
+    }
+
+    return match ($yearDifference) {
+        0 => '1st Year',
+        1 => '2nd Year',
+        2 => '3rd Year',
+        3 => 'Final Year',
+        default => 'N/A',
+    };
+}
      public function department()
     {
         return $this->belongsTo(Department::class);
