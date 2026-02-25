@@ -120,11 +120,16 @@
 
                     @forelse($students as $student)
 
-                        @php
+                        <!-- @php
                             $attendance = $student->attendances->first();
                             $status = $attendance->status ?? '-';
                             $year = now()->year - $student->admission_year + 1;
-                        @endphp
+                        @endphp -->
+                        @php
+    $now = now();
+    $academicYear = ($now->month >= 7) ? $now->year : $now->year - 1;
+    $year = $academicYear - $student->admission_year + 1;
+@endphp
 
                         <tr class="hover:bg-indigo-50 transition duration-150">
 
@@ -147,8 +152,9 @@
 
                             <!-- YEAR -->
                             <td class="px-5 py-4">
-                                <span class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-700 font-semibold">
-                                    {{ $year }} Year
+                                 <span class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-700 font-semibold">
+                                    <!-- {{ $year }} Year -->
+                                      {{ $student->study_year }}
                                 </span>
                             </td>
 

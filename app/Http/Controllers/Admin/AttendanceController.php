@@ -17,7 +17,9 @@ class AttendanceController extends Controller
     */
  public function index(Request $request)
 {
-    $currentYear = now()->year;
+    // $currentYear = now()->year;
+    $now = now();
+    $currentYear = ($now->month >= 7) ? $now->year : $now->year - 1;
     $date = $request->date ?? now()->toDateString();
 
     $students = collect();
@@ -123,7 +125,9 @@ class AttendanceController extends Controller
 
 public function ajaxStudents(Request $request)
 {
-    $currentYear = now()->year;
+    // $currentYear = now()->year;
+    $now = now();
+$currentYear = ($now->month >= 7) ? $now->year : $now->year - 1;
     $date = $request->date ?? now()->toDateString();
 
     $students = collect();
@@ -189,7 +193,9 @@ public function bulkSave(Request $request)
 
     try {
 
-        $currentYear = now()->year;
+        // $currentYear = now()->year;
+        $now = now();
+        $currentYear = ($now->month >= 7) ? $now->year : $now->year - 1;
         $alreadyMarked = Attendance::where('date', $request->date)
 
             ->whereIn('student_id', function ($q) use ($request, $currentYear) {
@@ -461,7 +467,10 @@ public function update(Request $request)
 
 public function dayList(Request $request)
 {
-    $currentYear = now()->year;
+    // $currentYear = now()->year;/
+    $now = now();
+    $currentYear = ($now->month >= 7) ? $now->year : $now->year - 1;
+    // dd($currentYear);
     $date = $request->date ?? now()->toDateString();
 
     $query = Student::with([

@@ -11,13 +11,21 @@
     @forelse($students as $student)
 
         @php
-            $yearLevel = now()->year - $student->admission_year + 1;
-            $yearLabel = ($yearLevel >= 1 && $yearLevel <= 4)
-                ? $yearLevel . ' Year'
-                : 'Passout';
+    $now = now();
+    $academicYear = ($now->month >= 7) ? $now->year : $now->year - 1;
 
-            $attendance = $student->attendances->first();
-        @endphp
+    $yearLevel = $academicYear - $student->admission_year + 1;
+
+    if ($yearLevel >= 1 && $yearLevel <= 4) {
+        $yearLabel = $yearLevel . ' Year';
+    } elseif ($yearLevel > 4) {
+        $yearLabel = 'Passout';
+    } else {
+        $yearLabel = 'Not Started';
+    }
+
+    $attendance = $student->attendances->first();
+@endphp
 
         <tr class="hover:bg-indigo-50">
             <td class="px-4 py-3 text-center">
