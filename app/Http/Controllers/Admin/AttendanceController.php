@@ -53,13 +53,12 @@ class AttendanceController extends Controller
             ->get();
 
         // Check if attendance already marked
-      if ($students->isNotEmpty()) {
+    if ($students->isNotEmpty()) {
 
-    $attendanceCount = Attendance::whereDate('date', $date)
+    $attendanceExists = Attendance::whereDate('date', $date)
         ->whereIn('student_id', $students->pluck('id'))
-        ->count();
+        ->count() >= $students->count();
 
-    $attendanceExists = $attendanceCount === $students->count();
 }
 
     }
@@ -161,14 +160,13 @@ $currentYear = ($now->month >= 7) ? $now->year : $now->year - 1;
         ->orderBy('rollnum')
         ->get();
 
-        if ($students->isNotEmpty()) {
+       if ($students->isNotEmpty()) {
 
-            $attendanceCount = Attendance::whereDate('date', $date)
-                ->whereIn('student_id', $students->pluck('id'))
-                ->count();
+    $attendanceExists = Attendance::whereDate('date', $date)
+        ->whereIn('student_id', $students->pluck('id'))
+        ->count() >= $students->count();
 
-            $attendanceExists = $attendanceCount === $students->count();
-        }
+}
     }
 
     return view('admin.attendance.partials.students', [
@@ -204,7 +202,7 @@ public function bulkSave(Request $request)
                 ->where('department_id', $request->department)
                 ->where('section_id', $request->section)
                 ->whereRaw("(? - admission_year + 1) = ?", [
-                    now()->year,
+                    $currentYear,
                     (int)$request->year
                 ]);
             })

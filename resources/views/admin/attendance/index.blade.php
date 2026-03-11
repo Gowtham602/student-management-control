@@ -192,7 +192,7 @@
 
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-gray-500">
+                        <td colspan="7" class="text-center py-4 text-gray-500">
                             No students found
                         </td>
                     </tr>
@@ -275,121 +275,14 @@
             });
     }
 
-    // document.addEventListener('DOMContentLoaded', function() {
 
-    //     const attendanceForm = document.getElementById('attendanceForm');
-
-    //     attendanceForm.addEventListener('submit', function() {
-
-
-    //         let sample = document.querySelectorAll('.hidden-student').forEach(e => e.remove());
-    //         console.log(sample, "_____sample");
-    //         selectedStudents.forEach(id => {
-    //             let input = document.createElement('input');
-    //             input.type = 'hidden';
-    //             input.name = 'students[]';
-    //             input.value = id;
-    //             input.classList.add('hidden-student');
-    //             this.appendChild(input);
-    //         });
-
-    //     });
-
-    // });
-
-    // const attendanceForm = document.getElementById('attendanceForm');
-
-    // attendanceForm.addEventListener('submit', function() {
-    //    //  Department Validation
-    // if (!department.value) {
-    //     e.preventDefault();
-    //     Swal.fire({
-    //         icon: 'warning',
-    //         title: 'Please select Department',
-    //         confirmButtonColor: '#6366f1'
-    //     });
-    //     return;
-    // }
-
-    // //  Section Validation
-    // if (!section.value) {
-    //     e.preventDefault();
-    //     Swal.fire({
-    //         icon: 'warning',
-    //         title: 'Please select Section',
-    //         confirmButtonColor: '#6366f1'
-    //     });
-    //     return;
-    // }
-
-    // //  Year Validation
-    // if (!year.value) {
-    //     e.preventDefault();
-    //     Swal.fire({
-    //         icon: 'warning',
-    //         title: 'Please select Year',
-    //         confirmButtonColor: '#6366f1'
-    //     });
-    //     return;
-    // }
-    // const attendanceForm = document.getElementById('attendanceForm');
-
-// attendanceForm.addEventListener('submit', function(e) {
-
-//     if (!department.value) {
-//         e.preventDefault();
-//         Swal.fire({
-//             icon: 'warning',
-//             title: 'Please select Department',
-//             confirmButtonColor: '#6366f1'
-//         });
-//         return;
-//     }
-
-//     if (!section.value) {
-//         e.preventDefault();
-//         Swal.fire({
-//             icon: 'warning',
-//             title: 'Please select Section',
-//             confirmButtonColor: '#6366f1'
-//         });
-//         return;
-//     }
-
-//     if (!year.value) {
-//         e.preventDefault();
-//         Swal.fire({
-//             icon: 'warning',
-//             title: 'Please select Year',
-//             confirmButtonColor: '#6366f1'
-//         });
-//         return;
-//     }
-
-//     // Send filter values
-//     document.getElementById('hiddenDepartment').value = department.value;
-//     document.getElementById('hiddenSection').value = section.value;
-//     document.getElementById('hiddenYear').value = year.value;
-
-//     document.querySelectorAll('.hidden-student').forEach(el => el.remove());
-
-//     Object.keys(selectedStudents).forEach(id => {
-//         let input = document.createElement('input');
-//         input.type = 'hidden';
-//         input.name = 'students[]';
-//         input.value = id;
-//         input.classList.add('hidden-student');
-//         this.appendChild(input);
-//     });
-
-// });
 const attendanceForm = document.getElementById('attendanceForm');
 
 attendanceForm.addEventListener('submit', function (e) {
 
     e.preventDefault(); // Stop default submit
 
-    // 🔹 Validate Filters
+    //  Validate Filters
     if (!department.value) {
         Swal.fire({
             icon: 'warning',
@@ -436,13 +329,22 @@ attendanceForm.addEventListener('submit', function (e) {
 
         if (result.isConfirmed) {
 
+            Swal.fire({
+            title: 'Saving Attendance...',
+            html: 'Please wait while attendance is being processed.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
             // Send filter values
             document.getElementById('hiddenDepartment').value = department.value;
             document.getElementById('hiddenSection').value = section.value;
             document.getElementById('hiddenYear').value = year.value;
 
             // Remove old hidden students
-            document.querySelectorAll('.hidden-student')
+            attendanceForm.querySelectorAll('.hidden-student')
                 .forEach(el => el.remove());
 
             // Add selected students (ABSENT)
