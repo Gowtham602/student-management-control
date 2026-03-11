@@ -50,6 +50,13 @@
             Filter
         </button>
 
+        <input type="text"
+name="search"
+value="{{ request('search') }}"
+placeholder="Search Roll No / Name"
+onkeyup="this.form.submit()"
+class="border rounded-lg px-3 py-2 text-sm">
+
         <a href="{{ route('admin.attendance.day') }}"
             class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm">
             Reset
@@ -126,16 +133,16 @@
                             $year = now()->year - $student->admission_year + 1;
                         @endphp -->
                         @php
-    $now = now();
-    $academicYear = ($now->month >= 7) ? $now->year : $now->year - 1;
-    $year = $academicYear - $student->admission_year + 1;
-@endphp
+                            $now = now();
+                            $academicYear = ($now->month >= 7) ? $now->year : $now->year - 1;
+                            $year = $academicYear - $student->admission_year + 1;
+                        @endphp
 
                         <tr class="hover:bg-indigo-50 transition duration-150">
 
                             <!-- S.NO -->
                             <td class="px-5 py-4 font-medium text-gray-500">
-                                {{ $loop->iteration }}
+                                {{ ($students->currentPage() - 1) * $students->perPage() + $loop->iteration }}
                             </td>
 
                             <!-- ROLL -->
@@ -170,7 +177,10 @@
 
                             <!-- STATUS -->
                            <td class="px-5 py-4 text-center">
-
+@php
+$attendance = $student->attendances->first();
+$status = $attendance->status ?? '';
+@endphp
     <form method="POST" action="{{ route('admin.attendance.update') }}">
         @csrf
 

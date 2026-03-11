@@ -465,12 +465,97 @@ public function update(Request $request)
 // }
 
 
+// public function dayList(Request $request)
+// {
+//     // $currentYear = now()->year;/
+//     $now = now();
+//     $currentYear = ($now->month >= 7) ? $now->year : $now->year - 1;
+//     // dd($currentYear);
+//     $date = $request->date ?? now()->toDateString();
+
+//     $query = Student::with([
+//         'department',
+//         'section',
+//         'attendances' => function ($q) use ($date) {
+//             $q->whereDate('date', $date);
+//         }
+//     ])
+//     ->whereRaw("(? - admission_year + 1) BETWEEN 1 AND 4", [$currentYear]);
+
+//     if ($request->filled(['department','section','year'])) {
+
+//         $query->where('department_id', $request->department)
+//               ->where('section_id', $request->section)
+//               ->whereRaw("(? - admission_year + 1) = ?", [
+//                   $currentYear,
+//                   (int) $request->year
+//               ]);
+
+//     } else {
+//         $query->whereRaw("1 = 0");
+//     }
+//     $query = Student::with(['department','section','attendances']);
+
+
+
+
+
+
+// if ($request->search) {
+//     $query->where(function($q) use ($request){
+//         $q->where('name','like','%'.$request->search.'%')
+//           ->orWhere('rollnum','like','%'.$request->search.'%');
+//     });
+// }
+
+// // $students = $query->paginate(15)->withQueryString();
+
+//     // Get paginated students (for table)
+//     $students = (clone $query)
+//                     ->orderBy('rollnum')
+//                     ->paginate(15)
+//                     ->withQueryString();
+
+//     // Get all students (for counting only)
+//     $allStudents = (clone $query)->get();
+
+//     $presentCount = 0;
+//     $absentCount  = 0;
+//     $notMarked    = 0;
+
+//     foreach ($allStudents as $student) {
+//         $attendance = $student->attendances->first();
+
+//         if (!$attendance) {
+//             $notMarked++;
+//         } elseif ($attendance->status === 'P') {
+//             $presentCount++;
+//         } elseif ($attendance->status === 'A') {
+//             $absentCount++;
+//         }
+//     }
+
+//     return view('admin.attendance.day', [
+//         'students'     => $students,
+//         'date'         => $date,
+//         'presentCount' => $presentCount,
+//         'absentCount'  => $absentCount,
+//         'notMarked'    => $notMarked,
+//         'departments'  => Department::orderBy('name')->get(),
+//         'sections'     => $request->department
+//             ? Section::where('department_id', $request->department)
+//                 ->orderBy('name')
+//                 ->get()
+//             : collect(),
+//     ]);
+// }
+
+
 public function dayList(Request $request)
 {
-    // $currentYear = now()->year;/
     $now = now();
     $currentYear = ($now->month >= 7) ? $now->year : $now->year - 1;
-    // dd($currentYear);
+
     $date = $request->date ?? now()->toDateString();
 
     $query = Student::with([
@@ -480,28 +565,41 @@ public function dayList(Request $request)
             $q->whereDate('date', $date);
         }
     ])
-    ->whereRaw("(? - admission_year + 1) BETWEEN 1 AND 4", [$currentYear]);
+    ->whereRaw("(? - admission_year + 1) BETWEEN 1 AND 4", [$currentYear])
+    ->where('passout_year','>=',$currentYear);
 
+    /* FILTER */
     if ($request->filled(['department','section','year'])) {
 
-        $query->where('department_id', $request->department)
-              ->where('section_id', $request->section)
-              ->whereRaw("(? - admission_year + 1) = ?", [
-                  $currentYear,
-                  (int) $request->year
+        $query->where('department_id',$request->department)
+              ->where('section_id',$request->section)
+              ->whereRaw("(? - admission_year + 1) = ?",[
+                    $currentYear,
+                    (int)$request->year
               ]);
-
-    } else {
+    } 
+    else {
         $query->whereRaw("1 = 0");
     }
 
-    // Get paginated students (for table)
+    /* SEARCH */
+    if ($request->filled('search')) {
+
+        $query->where(function($q) use ($request){
+
+            $q->where('name','like','%'.$request->search.'%')
+              ->orWhere('rollnum','like','%'.$request->search.'%');
+
+        });
+    }
+
+    /* PAGINATION */
     $students = (clone $query)
                     ->orderBy('rollnum')
                     ->paginate(15)
                     ->withQueryString();
 
-    // Get all students (for counting only)
+    /* COUNTS */
     $allStudents = (clone $query)->get();
 
     $presentCount = 0;
@@ -509,34 +607,32 @@ public function dayList(Request $request)
     $notMarked    = 0;
 
     foreach ($allStudents as $student) {
+
         $attendance = $student->attendances->first();
 
-        if (!$attendance) {
+        if(!$attendance){
             $notMarked++;
-        } elseif ($attendance->status === 'P') {
+        }
+        elseif($attendance->status == 'P'){
             $presentCount++;
-        } elseif ($attendance->status === 'A') {
+        }
+        elseif($attendance->status == 'A'){
             $absentCount++;
         }
     }
 
-    return view('admin.attendance.day', [
-        'students'     => $students,
-        'date'         => $date,
-        'presentCount' => $presentCount,
-        'absentCount'  => $absentCount,
-        'notMarked'    => $notMarked,
-        'departments'  => Department::orderBy('name')->get(),
-        'sections'     => $request->department
-            ? Section::where('department_id', $request->department)
-                ->orderBy('name')
-                ->get()
+    return view('admin.attendance.day',[
+        'students'=>$students,
+        'date'=>$date,
+        'presentCount'=>$presentCount,
+        'absentCount'=>$absentCount,
+        'notMarked'=>$notMarked,
+        'departments'=>Department::orderBy('name')->get(),
+        'sections'=>$request->department
+            ? Section::where('department_id',$request->department)->orderBy('name')->get()
             : collect(),
     ]);
 }
-
-
-
 
 
     /*
