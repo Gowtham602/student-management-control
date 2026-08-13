@@ -7,36 +7,69 @@ use Illuminate\Support\Facades\Log;
 
 class SmsService
 {
-    public static function send($phone, $message)
-    {
+    public static function send(
+        string $phone,
+        string $message,
+        ?string $templateId = null
+    ): array {
+
+        Log::info('SMS SERVICE CALLED', [
+            'phone' => $phone,
+            'template_id' => $templateId,
+        ]);
+
         try {
 
-            $response = Http::get(config('services.sms.base_url'), [
-                'username'     => config('services.sms.username'),
+            $templateId = $templateId ?: config('services.sms.t_id');
+
+            $params = [
+                'username' => config('services.sms.username'),
                 'api_password' => config('services.sms.password'),
-                'sender'       => config('services.sms.sender'),
-                'to'           => $phone,
-                'message'      => $message,
-                'priority'     => config('services.sms.priority'),
-                'e_id'         => config('services.sms.e_id'),
-                't_id'         => config('services.sms.t_id'),
-            ]);
+                'sender' => config('services.sms.sender'),
+                'to' => $phone,
+                'message' => $message,
+                'priority' => config('services.sms.priority'),
+                'e_id' => config('services.sms.e_id'),
+                't_id' => $templateId,
+            ];
 
-            Log::info('SMS Sent', [
+            Log::info('Ideal SMS Request', [
                 'phone' => $phone,
-                'response' => $response->body()
+                'template_id' => $templateId,
+                'entity_id' => config('services.sms.e_id'),
+                'sender' => config('services.sms.sender'),
+                'message' => $message,
             ]);
 
-            return true;
+            $response = Http::timeout(20)->get(
+                config('services.sms.base_url'),
+                $params
+            );
 
-        } catch (\Exception $e) {
+            $body = trim($response->body());
 
-            Log::error('SMS Failed', [
+            Log::info('Ideal SMS Response', [
                 'phone' => $phone,
-                'error' => $e->getMessage()
+                'http_status' => $response->status(),
+                'response' => $body,
             ]);
 
-            return false;
+            return [
+                'success' => $response->successful(),
+                'response' => $body,
+            ];
+
+        } catch (\Throwable $e) {
+
+            Log::error('Ideal SMS Exception', [
+                'phone' => $phone,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'response' => $e->getMessage(),
+            ];
         }
     }
 }

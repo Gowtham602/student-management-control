@@ -52,7 +52,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-@stack('scripts')
+<!-- @stack('scripts') -->
 
 {{-- Page-specific JS --}}
 @stack('scripts')

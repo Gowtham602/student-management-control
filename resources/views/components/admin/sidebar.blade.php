@@ -123,7 +123,40 @@
            {{ request()->routeIs('admin.attendance.day') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-indigo-50' }}">
             Student Day Attendance
         </a>
+{{-- Parent Communication --}}
+<a href="{{ route('admin.parent-communications.index') }}"
+   class="flex items-center gap-3 px-3 py-2 rounded-lg transition
+   {{ request()->routeIs('admin.parent-communications.*')
+        ? 'bg-indigo-100 text-indigo-700'
+        : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
 
+    <svg class="w-5 h-5"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         viewBox="0 0 24 24">
+
+        <path stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8 10h8M8 14h5m6 7-3.5-2H8a5 5 0 01-5-5V8a5 5 0 015-5h8a5 5 0 015 5v6a5 5 0 01-2 4l-1 3z" />
+    </svg>
+
+    <span class="text-sm font-medium">
+        Parent Communication
+    </span>
+
+</a>
+
+
+<a
+    href="{{ route('admin.parent-communications.pending') }}"
+    class="ml-6 block px-3 py-2 rounded-lg text-sm
+    {{ request()->routeIs('admin.parent-communications.pending')
+        ? 'bg-indigo-100 text-indigo-700'
+        : 'text-gray-600 hover:bg-indigo-50' }}"
+>
+    Pending Approvals
+</a>
     </div>
 </div>
 

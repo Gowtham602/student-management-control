@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\{
     SectionController,
     AttendanceController
 };
-
+use App\Http\Controllers\Admin\ParentCommunicationController;
 // Route::get('/', fn () => view('welcome'));
 
 
@@ -93,7 +93,71 @@ Route::middleware(['auth', 'role:admin'])
 
     Route::get('/attendance/ajax-students',[AttendanceController::class, 'ajaxStudents'])
         ->name('attendance.ajaxStudents');
+
+
+
+    /*
+|--------------------------------------------------------------------------
+| Parent Communication
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('parent-communications')
+    ->name('parent-communications.')
+    ->group(function () {
+
+        Route::get(
+            '/',
+            [ParentCommunicationController::class, 'index']
+        )->name('index');
+
+        Route::get(
+            '/students',
+            [ParentCommunicationController::class, 'students']
+        )->name('students');
+
+        Route::post(
+            '/',
+            [ParentCommunicationController::class, 'store']
+        )->name('store');
+
+        Route::get(
+            '/pending',
+            [ParentCommunicationController::class, 'pending']
+        )->name('pending');
+
+        Route::post(
+            '/{id}/confirm',
+            [ParentCommunicationController::class, 'confirm']
+        )->name('confirm');
+
+        Route::post(
+            '/{id}/reject',
+            [ParentCommunicationController::class, 'reject']
+        )->name('reject');
+
+        Route::post(
+            '/{id}/send',
+            [ParentCommunicationController::class, 'send']
+        )->name('send');
+
+        // TEMPORARY TEST
+        Route::get(
+            '/test-send/{id}',
+            [ParentCommunicationController::class, 'send']
+        )->name('test-send');
+
+        Route::get(
+            '/test-sms',
+            [ParentCommunicationController::class, 'testSms']
+        )->name('test-sms');
+    });
 });
+
+
+
+
+
 
 /*
 |--------------------------------------------------------------------------
