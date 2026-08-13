@@ -42,4 +42,32 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    //msm message templeted t parent 
+    'idealsms' => [
+
+    'url' => env(
+        'IDEAL_SMS_URL',
+        'http://its.idealsms.in/pushsms.php'
+    ),
+
+    'username' => env('IDEAL_SMS_USERNAME'),
+
+    'password' => env('IDEAL_SMS_PASSWORD'),
+
+    'sender' => env('IDEAL_SMS_SENDER', 'IDLSMS'),
+
+    'entity_id' => env('IDEAL_SMS_ENTITY_ID'),
+
+    'templates' => [
+
+        'parent_meeting' =>
+            env('IDEAL_SMS_PARENT_MEETING_TEMPLATE_ID'),
+
+        'parent_meeting_tamil' =>
+            env('IDEAL_SMS_PARENT_MEETING_TAMIL_TEMPLATE_ID'),
+
+    ],
+
+],
+
 ];

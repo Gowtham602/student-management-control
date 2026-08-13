@@ -6,6 +6,7 @@ use App\Models\Student;
 use App\Models\Department;
 use App\Models\Section;
 use Throwable;
+
 use Maatwebsite\Excel\Concerns\{
     ToModel,
     WithHeadingRow,
@@ -16,7 +17,7 @@ use Maatwebsite\Excel\Concerns\{
     SkipsErrors
 };
 
-class StudentsImport implements 
+class StudentsImport implements
     ToModel,
     WithHeadingRow,
     WithValidation,
@@ -30,78 +31,196 @@ class StudentsImport implements
 
     public function model(array $row)
     {
-        $row = array_map('trim', array_change_key_case($row, CASE_LOWER));
+        $row = array_map(
+            'trim',
+            array_change_key_case($row, CASE_LOWER)
+        );
 
+        /*
+        |--------------------------------------------------------------------------
+        | Semester
+        |--------------------------------------------------------------------------
+        */
 
-         $gender = strtolower(trim($row['gender'] ?? ''));
-        if (!in_array($gender, ['male', 'female', 'other'])) {
-        $gender = null;
-        }
-        //  Find department by CODE (CSE, ECE, MECH)
-        $department = Department::where('code', $row['department'])->first();
+        $semester = $this->convertSemester(
+            $row['semester'] ?? ''
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Department
+        |--------------------------------------------------------------------------
+        */
+
+        $departmentValue = trim($row['department'] ?? '');
+
+        $department = Department::where('name', $departmentValue)
+            ->orWhere('code', $departmentValue)
+            ->first();
 
         if (!$department) {
-            return null; // skip invalid department
+            return null;
         }
 
-        //  Find section under that department
+        /*
+        |--------------------------------------------------------------------------
+        | Section
+        |--------------------------------------------------------------------------
+        */
+
+        $sectionValue = trim($row['section'] ?? '');
+
         $section = Section::where('department_id', $department->id)
-                          ->where('name', $row['section'])
-                          ->first();
+            ->where('name', $sectionValue)
+            ->first();
 
         if (!$section) {
-            return null; // skip invalid section
+            return null;
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Gender
+        |--------------------------------------------------------------------------
+        */
+
+        $gender = strtolower(trim($row['gender'] ?? ''));
+
+        if (!in_array($gender, ['male', 'female', 'other'])) {
+            $gender = null;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Student
+        |--------------------------------------------------------------------------
+        */
+
         $student = Student::updateOrCreate(
-            ['rollnum' => $row['rollnum']],
             [
-                'name'           => $row['name'],
-                'email'          => $row['email'] ?? null,
-                // 'gender'         => $row['gender'] ?? null,
-                'gender'         => $gender,
-                'phone'          => $row['phone'] ?? null,
-                'blood_group'    => $row['blood_group'] ?? null,
-                'father_phone'   => $row['father_phone'],
+                'rollnum' => $row['rollnum'],
+            ],
+            [
+                'name' => $row['name'],
+                'email' => $row['email'] ?? null,
+                'gender' => $gender,
 
-                //  RELATIONAL SAVE
-                'department_id'  => $department->id,
-                'section_id'     => $section->id ,
+                'phone' => $row['phone'] ?? null,
+                'blood_group' => $row['blood_group'] ?? null,
+                'father_phone' => $row['father_phone'] ?? null,
 
-                'admission_year'=> $row['admission_year'],
-                'passout_year'  => $row['passout_year'],
+                'department_id' => $department->id,
+                'section_id' => $section->id,
+
+                'semester' => $semester,
             ]
         );
 
-        $student->wasRecentlyCreated
-            ? $this->inserted++
-            : $this->updated++;
+        if ($student->wasRecentlyCreated) {
+            $this->inserted++;
+        } else {
+            $this->updated++;
+        }
 
         return null;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Convert Semester
+    |--------------------------------------------------------------------------
+    */
+
+    private function convertSemester($value): ?int
+    {
+        $value = strtolower(trim((string) $value));
+
+        return match ($value) {
+
+            '1',
+            'i',
+            'i semester',
+            '1st semester'
+                => 1,
+
+            '2',
+            'ii',
+            'ii semester',
+            '2nd semester'
+                => 2,
+
+            '3',
+            'iii',
+            'iii semester',
+            '3rd semester'
+                => 3,
+
+            '4',
+            'iv',
+            'iv semester',
+            '4th semester'
+                => 4,
+
+            '5',
+            'v',
+            'v semester',
+            '5th semester'
+                => 5,
+
+            '6',
+            'vi',
+            'vi semester',
+            '6th semester'
+                => 6,
+
+            '7',
+            'vii',
+            'vii semester',
+            '7th semester'
+                => 7,
+
+            '8',
+            'viii',
+            'viii semester',
+            '8th semester'
+                => 8,
+
+            default => null,
+        };
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation
+    |--------------------------------------------------------------------------
+    */
+
     public function rules(): array
     {
         return [
+
             '*.rollnum' => 'required|distinct',
+
             '*.name' => 'required|min:3',
-            // '*.email' => 'required|email',
-            // '*.gender' => 'required|in:male,female,other',
-            // '*.phone' => 'required|digits:10',
-            // Optional fields (validate only if value exists)
-            '*.email'          => 'nullable|email',
-            '*.gender'         => 'nullable|in:male,female,other',
-            '*.phone'          => 'nullable|digits:10',
-            '*.father_phone' => 'required|digits:10',
+
+            '*.email' => 'nullable|email',
+
+            '*.gender' => 'nullable|in:male,female,other',
+
+            '*.phone' => 'nullable|digits:10',
+
+            '*.father_phone' => 'nullable|digits:10',
+
             '*.department' => 'required',
+
             '*.section' => 'required',
-            '*.admission_year' => 'required|integer|between:1950,2100',
-            '*.passout_year' => 'required|integer|between:1950,2100',
+
+            '*.semester' => 'required',
         ];
     }
 
     public function onError(Throwable $e)
     {
-        // skip bad rows silently
+        // Skip database errors
     }
 }

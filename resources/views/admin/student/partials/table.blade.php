@@ -46,7 +46,8 @@
                     </td>
 
                     <td class="px-6 py-4">
-                        {{ $student->study_year }}
+                        <!-- {{ $student->study_year }} -->
+                          {{ $student->semester_name }}
                         {{-- OR --}}
                         {{-- {{ now()->year - $student->admission_year + 1 }} --}}
                     </td>

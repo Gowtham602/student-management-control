@@ -1,14 +1,36 @@
-<div class="h-full flex flex-col px-4 py-6 bg-white border-r">
+<div class="h-full flex flex-col px-3 py-6 bg-white border-r">
 
-    {{-- Brand --}}
-    <div class="flex items-center gap-2 mb-8 px-2">
-        <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold">
-            E
+     {{-- Brand --}}
+    <!-- <div class="flex-shrink-0 px-4 pt-6 pb-5"> -->
+
+        <div class="flex items-center gap-3 px-2 mb-3">
+
+            {{-- Logo --}}
+            <div class="w-10 h-10 flex-shrink-0 rounded-xl bg-teal-700
+                        flex items-center justify-center text-white shadow-sm">
+
+                <span class="text-lg font-bold">
+                    N
+                </span>
+
+            </div>
+
+            {{-- Brand Name --}}
+            <div class="leading-tight min-w-0">
+
+                <span class="block text-lg font-bold text-gray-800 truncate">
+                    Nursing
+                </span>
+
+                <span class="block text-xs text-gray-500 truncate">
+                    College ERP
+                </span>
+
+            </div>
+
         </div>
-        <span class="text-lg font-semibold text-gray-800">
-            EduAdmin
-        </span>
-    </div>
+
+    <!-- </div> -->
 
     {{-- Navigation --}}
     <nav class="space-y-1">
@@ -112,9 +134,9 @@
     </nav>
 
     {{-- Footer --}}
-    <div class="mt-auto px-2 text-xs text-gray-400">
+    <!-- <div class="mt-auto px-2 text-xs text-gray-400">
         © {{ date('Y') }} EduAdmin
-    </div>
+    </div> -->
 
 </div>
 <script>

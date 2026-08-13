@@ -187,67 +187,139 @@ class StudentController extends Controller
 //     ]);
 // }
 
+//current working today 
+// public function index(Request $request)
+// {
+//     $now = now();
 
+//     // Academic year starts in July
+//     $academicYear = ($now->month >= 7) ? $now->year : $now->year - 1;
+
+//     $students = Student::with('department','section')
+
+//         // SEARCH
+//         ->when($request->search, function ($q) use ($request) {
+//             $q->where(function ($sub) use ($request) {
+//                 $sub->where('name','like',"%{$request->search}%")
+//                     ->orWhere('email','like',"%{$request->search}%")
+//                     ->orWhere('rollnum','like',"%{$request->search}%");
+//             });
+//         })
+
+//         // DEPARTMENT FILTER
+//         ->when($request->department, fn($q) =>
+//             $q->where('department_id', $request->department)
+//         )
+
+//         // SECTION FILTER
+//         ->when($request->section, fn($q) =>
+//             $q->where('section_id', $request->section)
+//         )
+
+//         // YEAR FILTER (ACADEMIC BASED)
+//         ->when($request->year, function ($q) use ($request, $academicYear) {
+
+//             if ($request->year == 'passout') {
+//                 $q->where('passout_year', '<=', $academicYear);
+//             } else {
+//                 $targetAdmissionYear = $academicYear - ($request->year - 1);
+//                 $q->where('admission_year', $targetAdmissionYear);
+//             }
+//         })
+
+//         // SORT BY STUDY YEAR PROPERLY
+//         ->orderByRaw("
+//             CASE
+//                 WHEN ? > passout_year THEN 5
+//                 ELSE (? - admission_year)
+//             END ASC
+//         ", [$academicYear, $academicYear])
+
+//         ->orderBy('name')
+
+//         ->paginate(10)
+//         ->withQueryString();
+
+//     if ($request->ajax()) {
+//         return view('admin.student.partials.table', compact('students'))->render();
+//     }
+
+//     return view('admin.student.index', [
+//         'students' => $students,
+//         'departments' => Department::orderBy('name')->get(),
+//         'sections' => Section::orderBy('name')->get(),
+//     ]);
+// }
 public function index(Request $request)
 {
-    $now = now();
-
-    // Academic year starts in July
-    $academicYear = ($now->month >= 7) ? $now->year : $now->year - 1;
-
-    $students = Student::with('department','section')
+    $students = Student::with('department', 'section')
 
         // SEARCH
         ->when($request->search, function ($q) use ($request) {
+
             $q->where(function ($sub) use ($request) {
-                $sub->where('name','like',"%{$request->search}%")
-                    ->orWhere('email','like',"%{$request->search}%")
-                    ->orWhere('rollnum','like',"%{$request->search}%");
+
+                $sub->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%")
+                    ->orWhere('rollnum', 'like', "%{$request->search}%");
+
             });
+
         })
 
-        // DEPARTMENT FILTER
-        ->when($request->department, fn($q) =>
-            $q->where('department_id', $request->department)
-        )
+        // DEPARTMENT
+        ->when($request->department, function ($q) use ($request) {
 
-        // SECTION FILTER
-        ->when($request->section, fn($q) =>
-            $q->where('section_id', $request->section)
-        )
+            $q->where(
+                'department_id',
+                $request->department
+            );
 
-        // YEAR FILTER (ACADEMIC BASED)
-        ->when($request->year, function ($q) use ($request, $academicYear) {
-
-            if ($request->year == 'passout') {
-                $q->where('passout_year', '<=', $academicYear);
-            } else {
-                $targetAdmissionYear = $academicYear - ($request->year - 1);
-                $q->where('admission_year', $targetAdmissionYear);
-            }
         })
 
-        // SORT BY STUDY YEAR PROPERLY
-        ->orderByRaw("
-            CASE
-                WHEN ? > passout_year THEN 5
-                ELSE (? - admission_year)
-            END ASC
-        ", [$academicYear, $academicYear])
+        // SECTION
+        ->when($request->section, function ($q) use ($request) {
+
+            $q->where(
+                'section_id',
+                $request->section
+            );
+
+        })
+
+        // SEMESTER
+        ->when($request->semester, function ($q) use ($request) {
+
+            $q->where(
+                'semester',
+                $request->semester
+            );
+
+        })
 
         ->orderBy('name')
-
         ->paginate(10)
         ->withQueryString();
 
     if ($request->ajax()) {
-        return view('admin.student.partials.table', compact('students'))->render();
+
+        return view(
+            'admin.student.partials.table',
+            compact('students')
+        )->render();
+
     }
 
     return view('admin.student.index', [
+
         'students' => $students,
-        'departments' => Department::orderBy('name')->get(),
-        'sections' => Section::orderBy('name')->get(),
+
+        'departments' =>
+            Department::orderBy('name')->get(),
+
+        'sections' =>
+            Section::orderBy('name')->get(),
+
     ]);
 }
 // public function index(Request $request)
@@ -403,24 +475,51 @@ public function index(Request $request)
     }
 
     // Import CSV / Excel
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|mimes:csv,xlsx'
-        ]);
+    // public function import(Request $request)
+    // {
+    //     $request->validate([
+    //         'file' => 'required|mimes:csv,xlsx'
+    //     ]);
 
-        $import = new StudentsImport();
-        Excel::import($import, $request->file('file'));
+    //     $import = new StudentsImport();
+    //     Excel::import($import, $request->file('file'));
 
-        return back()
-    ->with('summary', [
+    //     return back()
+    // ->with('summary', [
+    //     'inserted' => $import->inserted,
+    //     'updated' => $import->updated,
+    // ])
+    // ->with('failures', $import->failures());
+
+    // }
+public function import(Request $request)
+{
+    // dd([
+    //     'all' => $request->all(),
+    //     'file' => $request->file('file'),
+    //     'has_file' => $request->hasFile('file'),
+    // ]);
+
+    $request->validate([
+        'file' => 'required|file|mimes:csv,txt,xlsx|max:10240',
+    ]);
+
+    $import = new StudentsImport();
+
+    Excel::import($import, $request->file('file'));
+//  dd([
+//         'inserted' => $import->inserted,
+//         'updated' => $import->updated,
+//         'failures' => $import->failures(),
+//     ]);
+    return back()->with('summary', [
         'inserted' => $import->inserted,
         'updated' => $import->updated,
-    ])
-    ->with('failures', $import->failures());
-
-    }
-
+    ])->with(
+        'failures',
+        $import->failures()
+    );
+}
 
     // department fetch in 
 

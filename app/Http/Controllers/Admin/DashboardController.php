@@ -15,50 +15,89 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
-        // Basic counts
+        // -----------------------------------------
+        // BASIC COUNTS
+        // -----------------------------------------
+
         $totalStudents = Student::count();
+
         $totalDepartments = Department::count();
+
         $totalSections = Section::count();
 
-        $today = now()->toDateString();
 
-        $absentStudents = Student::with(['department'])
+        // -----------------------------------------
+        // ABSENT STUDENTS TODAY
+        // -----------------------------------------
+
+        $absentStudents = Student::with('department')
             ->whereHas('attendances', function ($q) use ($today) {
+
                 $q->whereDate('date', $today)
-                ->where('status', 'A');
+                  ->where('status', 'A');
+
             })
             ->orderBy('rollnum')
             ->get();
 
-        // Attendance counts
+
+        // -----------------------------------------
+        // ATTENDANCE COUNTS
+        // -----------------------------------------
+
         $presentToday = Attendance::whereDate('date', $today)
-                            ->where('status', 'P')
-                            ->count();
+            ->where('status', 'P')
+            ->count();
 
         $absentToday = Attendance::whereDate('date', $today)
-                            ->where('status', 'A')
-                            ->count();
+            ->where('status', 'A')
+            ->count();
 
-        $notMarked = $totalStudents - ($presentToday + $absentToday);
+
+        $notMarked = max(
+            0,
+            $totalStudents - ($presentToday + $absentToday)
+        );
+
+
+        // -----------------------------------------
+        // ATTENDANCE PERCENTAGE
+        // -----------------------------------------
 
         $attendancePercentage = $totalStudents > 0
             ? round(($presentToday / $totalStudents) * 100)
             : 0;
 
-        // Students by Year
-        // $currentYear = now()->year;
-        $now = now();
-        $academicYear = Student::academicYear();
+
+        // -----------------------------------------
+        // STUDENTS BY YEAR
+        // -----------------------------------------
 
         $yearCounts = [
-            '1st' => Student::where('admission_year', $academicYear)->count(),
-            '2nd' => Student::where('admission_year', $academicYear - 1)->count(),
-            '3rd' => Student::where('admission_year', $academicYear - 2)->count(),
-            '4th' => Student::where('admission_year', $academicYear - 3)->count(),
+
+            '1st' => Student::whereIn('semester', [1, 2])->count(),
+
+            '2nd' => Student::whereIn('semester', [3, 4])->count(),
+
+            '3rd' => Student::whereIn('semester', [5, 6])->count(),
+
+            '4th' => Student::whereIn('semester', [7, 8])->count(),
+
         ];
 
-        // Recent Students
-        $recentStudents = Student::latest()->take(5)->get();
+
+        // -----------------------------------------
+        // RECENT STUDENTS
+        // -----------------------------------------
+
+        $recentStudents = Student::latest()
+            ->take(5)
+            ->get();
+
+
+        // -----------------------------------------
+        // RETURN DASHBOARD
+        // -----------------------------------------
 
         return view('admin.dashboard', compact(
             'totalStudents',
@@ -74,4 +113,3 @@ class DashboardController extends Controller
         ));
     }
 }
-

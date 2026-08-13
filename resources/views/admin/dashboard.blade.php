@@ -118,7 +118,8 @@
 
                         <td  class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-700 font-semibold">
                             <!-- {{ $year }} Year -->
-                              {{ $student->study_year }}
+                              <!-- {{ $student->study_year }} -->
+                            {{ $student->semester_name }}
                         </td>
 
                     </tr>

@@ -21,78 +21,47 @@ class Student extends Model
         'blood_group',
         'father_phone',
         'department_id',
-        'admission_year',
         'section_id',
-        'section',
-        'passout_year',
+        'semester',
     ];
 
-    // AUTO CURRENT STUDY YEAR 
-    // public function getStudyYearAttribute(): string
-    // {
-    //     if (!$this->admission_year || !$this->passout_year) {
-    //         return 'N/A';
-    //     }
+    protected $casts = [
+        'semester' => 'integer',
+    ];
 
-    //     $currentYear = now()->year;  
-
-    //     if ($currentYear < $this->admission_year) {
-    //         return 'Not Started';
-    //     }
-
-    //     if ($currentYear > $this->passout_year) {
-    //         return 'Passed Out';
-    //     }
-
-    //     $year = ($currentYear - $this->admission_year) + 1;
-
-    //     return match ($year) {
-    //         1 => '1st Year',
-    //         2 => '2nd Year',
-    //         3 => '3rd Year',
-    //         4 => 'Final Year',
-    //         default => 'Passed Out',
-    //     };
-    // }
-
-
+    /**
+     * Display study year from semester.
+     */
     public function getStudyYearAttribute(): string
-{
-    if (!$this->admission_year) {
-        return 'N/A';
+    {
+        return match (true) {
+            in_array($this->semester, [1, 2]) => '1st Year',
+            in_array($this->semester, [3, 4]) => '2nd Year',
+            in_array($this->semester, [5, 6]) => '3rd Year',
+            in_array($this->semester, [7, 8]) => 'Final Year',
+            default => 'N/A',
+        };
     }
 
-    $now = now();
-    
-
-    // Academic year starts in July
-    $academicYear = ($now->month >= 7) ? $now->year : $now->year - 1;
-
-    $yearDifference = $academicYear - $this->admission_year;
-
-    if ($yearDifference < 0) {
-        return 'Not Started';
+    /**
+     * Display semester name.
+     */
+    public function getSemesterNameAttribute(): string
+    {
+        return match ($this->semester) {
+            1 => 'I Semester',
+            2 => 'II Semester',
+            3 => 'III Semester',
+            4 => 'IV Semester',
+            5 => 'V Semester',
+            6 => 'VI Semester',
+            7 => 'VII Semester',
+            8 => 'VIII Semester',
+            default => 'N/A',
+        };
     }
 
-    if ($yearDifference >= 4) {
-        return 'Passed Out';
-    }
-
-    return match ($yearDifference) {
-        0 => '1st Year',
-        1 => '2nd Year',
-        2 => '3rd Year',
-        3 => 'Final Year',
-        default => 'N/A',
-    };
-}
-
-public static function academicYear()
-{
-    $now = now();
-    return ($now->month >= 7) ? $now->year : $now->year - 1;
-}
-     public function department()
+    public function department()
     {
         return $this->belongsTo(Department::class);
     }
@@ -102,11 +71,8 @@ public static function academicYear()
         return $this->belongsTo(Section::class);
     }
 
-    
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
     }
-
-
 }
