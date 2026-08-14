@@ -22,12 +22,13 @@ class StoresStudentRequest extends FormRequest
             'father_phone'   => 'required|digits:10',
             'department_id' => 'required|exists:departments,id',
             'section_id' => 'required|exists:sections,id',
-
+            'semester'   => 'required|digits:1',
             //  YEAR FIELDS (CORRECT)
             // 'admission_year' => 'required|integer|min:2000|max:' . now()->year,
-            'admission_year' => 'required|integer|min:1950|max:' . (date('Y') + 1),
+            // 'admission_year' => 'required|integer|min:1950|max:' . (date('Y') + 1),
             // 'academic_year'  => 'required|string',     // ex: 2025-2026
-            'passout_year'   => 'required|integer|gte:admission_year',
+            // 'passout_year'   => 'required|integer|gte:admission_year',
+
         ];
     }
 }

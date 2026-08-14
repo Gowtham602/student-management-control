@@ -136,21 +136,21 @@
 
         {{-- Admission Year--}}
 
-         <div>
+         <!-- <div>
             <label class="label">Admission Year</label>
             <input name="admission_year"
                    class="input"
                    value="{{ old('admission_year', $student->admission_year) }}">
             @error('admission_year') <p class="error">{{ $message }}</p> @enderror
-        </div>
+        </div> -->
 
         {{-- Passout Year --}}
         <div>
-            <label class="label">Passout Year</label>
-            <input name="passout_year"
+            <label class="label">Semester</label>
+            <input name="semester"
                    class="input"
-                   value="{{ old('passout_year', $student->passout_year) }}">
-            @error('passout_year') <p class="error">{{ $message }}</p> @enderror
+                   value="{{ old('semester', $student->semester) }}">
+            @error('semester') <p class="error">{{ $message }}</p> @enderror
         </div>
 
         {{-- Actions --}}
@@ -185,8 +185,8 @@ $(function () {
            department_id: { required: true },
             section_id: { required: true },
 
-           admission_year: { required: true },
-            passout_year: { required: true }
+           semester: { required: true },
+           
         },
 
         submitHandler: function (form) {

@@ -38,9 +38,9 @@ class UpdatedStudentRequest extends FormRequest
         'father_phone'  => 'required|digits:10',
          'department_id' => 'required|exists:departments,id',
             'section_id' => 'required|exists:sections,id',
-        'admission_year'=> 'required',
+        'semester'=> 'required',
          
-        'passout_year'  =>'required',
+       
     ];
     }
 }

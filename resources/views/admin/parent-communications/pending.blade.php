@@ -442,14 +442,13 @@ function viewCommunication(id)
 |--------------------------------------------------------------------------
 */
 
-function confirmCommunication(id)
-{
+function confirmCommunication(id) {
+
     if (!confirm(
         'Are you sure you want to confirm this communication?'
     )) {
         return;
     }
-
 
     fetch(
         "{{ url('admin/parent-communications') }}/" +
@@ -460,25 +459,19 @@ function confirmCommunication(id)
 
             headers: {
                 'Accept': 'application/json',
-
                 'X-Requested-With': 'XMLHttpRequest',
-
                 'X-CSRF-TOKEN':
                     document
-                        .querySelector(
-                            'meta[name="csrf-token"]'
-                        )
+                        .querySelector('meta[name="csrf-token"]')
                         .getAttribute('content')
             }
         }
     )
-
     .then(async response => {
 
         const data = await response.json();
 
         if (!response.ok) {
-
             throw new Error(
                 data.message ||
                 'Unable to confirm communication.'
@@ -486,35 +479,42 @@ function confirmCommunication(id)
         }
 
         return data;
-
     })
-
     .then(data => {
 
-        alert(
-            data.message ||
-            'Communication confirmed successfully.'
+        toastr.success(
+            data.message || 'Communication confirmed successfully.',
+            'Success'
         );
 
-        window.location.reload();
+        setTimeout(() => {
+            window.location.reload();
+        }, 1200);
 
     })
-
     .catch(error => {
 
         console.error(error);
 
-        alert(error.message);
+        toastr.error(
+            error.message || 'Something went wrong.',
+            'Error'
+        );
 
     });
 }
-function sendCommunication(id)
-{
+function sendCommunication(id) {
+
     if (!confirm(
         'Are you sure you want to send SMS to all selected parents?'
     )) {
         return;
     }
+
+    toastr.info(
+        'Sending SMS, please wait...',
+        'Please Wait'
+    );
 
     fetch(
         "{{ url('admin/parent-communications') }}/" +
@@ -548,21 +548,46 @@ function sendCommunication(id)
     })
     .then(data => {
 
-        alert(
-            'SMS Result: Sent = ' +
-            data.sent +
-            ', Failed = ' +
-            data.failed
-        );
+        if (data.failed === 0) {
 
-        window.location.reload();
+            toastr.success(
+                'SMS sent successfully to ' +
+                data.sent +
+                ' parent(s).',
+                'SMS Sent'
+            );
+
+        } else if (data.sent > 0) {
+
+            toastr.warning(
+                'Sent: ' +
+                data.sent +
+                ' | Failed: ' +
+                data.failed,
+                'SMS Partially Sent'
+            );
+
+        } else {
+
+            toastr.error(
+                'All SMS failed.',
+                'SMS Failed'
+            );
+        }
+
+        setTimeout(() => {
+            window.location.reload();
+        }, 1800);
 
     })
     .catch(error => {
 
         console.error(error);
 
-        alert(error.message);
+        toastr.error(
+            error.message || 'Something went wrong.',
+            'Error'
+        );
 
     });
 }
@@ -573,14 +598,13 @@ function sendCommunication(id)
 |--------------------------------------------------------------------------
 */
 
-function rejectCommunication(id)
-{
+function rejectCommunication(id) {
+
     if (!confirm(
         'Are you sure you want to reject this communication?'
     )) {
         return;
     }
-
 
     fetch(
         "{{ url('admin/parent-communications') }}/" +
@@ -591,25 +615,19 @@ function rejectCommunication(id)
 
             headers: {
                 'Accept': 'application/json',
-
                 'X-Requested-With': 'XMLHttpRequest',
-
                 'X-CSRF-TOKEN':
                     document
-                        .querySelector(
-                            'meta[name="csrf-token"]'
-                        )
+                        .querySelector('meta[name="csrf-token"]')
                         .getAttribute('content')
             }
         }
     )
-
     .then(async response => {
 
         const data = await response.json();
 
         if (!response.ok) {
-
             throw new Error(
                 data.message ||
                 'Unable to reject communication.'
@@ -617,25 +635,27 @@ function rejectCommunication(id)
         }
 
         return data;
-
     })
-
     .then(data => {
 
-        alert(
-            data.message ||
-            'Communication rejected successfully.'
+        toastr.success(
+            data.message || 'Communication rejected successfully.',
+            'Rejected'
         );
 
-        window.location.reload();
+        setTimeout(() => {
+            window.location.reload();
+        }, 1200);
 
     })
-
     .catch(error => {
 
         console.error(error);
 
-        alert(error.message);
+        toastr.error(
+            error.message || 'Something went wrong.',
+            'Error'
+        );
 
     });
 }

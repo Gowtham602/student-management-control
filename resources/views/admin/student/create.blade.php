@@ -115,6 +115,16 @@
         </div>
 
 
+         <div>
+            <label class="label">Current Semester</label>
+            <input type="number"
+                name="semester"
+                class="input"
+                placeholder=" Ex: 3"
+                value="{{ old('semester') }}">
+            @error('semester') <p class="error">{{ $message }}</p> @enderror
+        </div>
+
         <!-- year
          <div>
             <label class="label">Academic Year</label>
@@ -131,7 +141,7 @@
             @error('passout_year') <p class="error">{{ $message }}</p> @enderror
         </div> -->
         {{-- Admission Year --}}
-        <div>
+        <!-- <div>
             <label class="label">Admission Year</label>
             <input type="number"
                 name="admission_year"
@@ -139,7 +149,7 @@
                 placeholder=" ex:2023"
                 value="{{ old('admission_year') }}">
             @error('admission_year') <p class="error">{{ $message }}</p> @enderror
-        </div>
+        </div> -->
 
         {{-- Academic Year --}}
         <!-- <div>
@@ -153,7 +163,7 @@
 </div> -->
 
         {{-- Passout Year --}}
-        <div>
+        <!-- <div>
             <label class="label">Passout Year</label>
             <input type="number"
                 name="passout_year"
@@ -161,7 +171,7 @@
                 placeholder=" Ex: 2026"
                 value="{{ old('passout_year') }}">
             @error('passout_year') <p class="error">{{ $message }}</p> @enderror
-        </div>
+        </div> -->
 
 
 
@@ -213,14 +223,12 @@ $(document).ready(function () {
             section_id: {
                 required: true
             },
-            admission_year: {
+            semester: {
                 required: true,
-                digits: true
+                digits: true,
+                minlength: 1,
+                maxlength: 3
             },
-            passout_year: {
-                required: true,
-                digits: true
-            }
         },
 
         submitHandler: function (form) {

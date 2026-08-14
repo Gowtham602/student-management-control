@@ -731,7 +731,7 @@ submitCommunication.addEventListener('click', function () {
 
     if (!departmentId) {
 
-        alert('Please select Department.');
+      toastr.warning('Please select Department.');
 
         return;
     }
@@ -739,7 +739,7 @@ submitCommunication.addEventListener('click', function () {
 
     if (!year) {
 
-        alert('Please select Year.');
+     toastr.warning('Please select Year.');
 
         return;
     }
@@ -747,7 +747,7 @@ submitCommunication.addEventListener('click', function () {
 
     if (!sectionId) {
 
-        alert('Please select Section.');
+        toastr.warning('Please select Section.');
 
         return;
     }
@@ -755,7 +755,7 @@ submitCommunication.addEventListener('click', function () {
 
     if (studentIds.length === 0) {
 
-        alert('Please select at least one student.');
+     toastr.warning('Please select at least one student.');
 
         return;
     }
@@ -763,15 +763,14 @@ submitCommunication.addEventListener('click', function () {
 
     if (!templateId) {
 
-        alert('Please select a message template.');
+      toastr.warning('Please select a message template.');
 
         return;
     }
 
 
     if (!messageValue) {
-
-        alert('Please enter the message.');
+toastr.warning('Please enter the message.');
 
         return;
     }
@@ -853,18 +852,22 @@ submitCommunication.addEventListener('click', function () {
 
         if (data.success) {
 
-            alert(
-                'Communication submitted successfully and is now PENDING approval.'
-            );
+             toastr.success(
+        'Communication submitted successfully and is now PENDING approval.'
+    );
+
+    setTimeout(() => {
+        window.location.reload();
+    }, 1500);
 
             window.location.reload();
 
         } else {
 
-            alert(
-                data.message ||
-                'Unable to submit communication.'
-            );
+          toastr.error(
+    data.message ||
+    'Unable to submit communication.'
+);
 
         }
 
@@ -877,7 +880,9 @@ submitCommunication.addEventListener('click', function () {
             error
         );
 
-        alert(error.message);
+        toastr.error(
+        error.message || 'Something went wrong.'
+    );
 
     })
 

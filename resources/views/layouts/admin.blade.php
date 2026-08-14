@@ -9,7 +9,10 @@
 
     {{-- Tailwind + Alpine --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
+/>
     {{-- Page-specific styles --}}
     @stack('styles')
 </head>
@@ -52,6 +55,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 <!-- @stack('scripts') -->
 
 {{-- Page-specific JS --}}
@@ -80,7 +86,15 @@ $.ajaxSetup({
     }
 });
 </script>
-
+<script>
+    toastr.options = {
+        closeButton: true,
+        progressBar: true,
+        positionClass: "toast-top-right",
+        timeOut: 3000,
+        extendedTimeOut: 1000
+    };
+</script>
 
 </body>
 </html>

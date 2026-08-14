@@ -23,6 +23,7 @@ class Student extends Model
         'department_id',
         'section_id',
         'semester',
+        'current_semester',
     ];
 
     protected $casts = [

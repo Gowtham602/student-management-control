@@ -19,237 +19,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class StudentController extends Controller
 {
 
-    // List students
-
-
-//     public function index(Request $request)
-// {
-//     $currentYear = now()->year;
-
-//     $students = Student::with('department','section')
-
-//         ->when($request->search, function ($q) use ($request) {
-//             $q->where(function ($sub) use ($request) {
-//                 $sub->where('name','like',"%{$request->search}%")
-//                     ->orWhere('email','like',"%{$request->search}%")
-//                     ->orWhere('rollnum','like',"%{$request->search}%");
-//             });
-//         })
-
-//         //  FILTER DEPARTMENT
-//         ->when($request->department, fn($q) =>
-//             $q->where('department_id', $request->department)
-//         )
-
-//         //  FILTER SECTION
-//         ->when($request->section, fn($q) =>
-//             $q->where('section_id', $request->section)
-//         )
-
-//         //  FILTER YEAR
-//         // ->when($request->year, fn($q) =>
-//         //     $q->where('admission_year', $request->year)
-//         // )
-//         ->when($request->year, function ($q) use ($request) {
-
-//          $currentYear = now()->year;
-
-//         $q->whereRaw(
-//             "(? - admission_year + 1) = ?",
-//             [$currentYear, $request->year]
-//         );
-//          })
-
-
-//         ->orderByRaw("
-//             CASE
-//                 WHEN ? < admission_year THEN 0
-//                 WHEN ? > passout_year THEN 5 
-//                 ELSE (? - admission_year) + 1
-//             END ASC
-//         ", [$currentYear, $currentYear, $currentYear])
-
-//         ->orderBy('name')
-//         ->paginate(10)
-//         ->withQueryString();
-
-//     return view('admin.student.index', [
-//         'students' => $students,
-//         'departments' => Department::orderBy('name')->get(),
-//         'sections' => Section::orderBy('name')->get(),
-//     ]);
-// }
-
-// public function index(Request $request)
-// {
-//     $currentYear = now()->year;
-
-//     $students = Student::with('department','section')
-
-
-
-        
-//     ->when($request->search, function ($q) use ($request) {
-//         $q->where(function ($sub) use ($request) {
-//             $sub->where('name','like',"%{$request->search}%")
-//                 ->orWhere('email','like',"%{$request->search}%")
-//                 ->orWhere('rollnum','like',"%{$request->search}%");
-//         });
-//     })
-
-//         ->when($request->department, fn($q) =>
-//             $q->where('department_id', $request->department)
-//         )
-
-//         ->when($request->section, fn($q) =>
-//             $q->where('section_id', $request->section)
-//         )
-
-//         ->when($request->year, function ($q) use ($request, $currentYear) {
-//             $q->whereRaw(
-//                 "(? - admission_year + 1) = ?",
-//                 [$currentYear, $request->year]
-//             );
-//         })
-
-//         ->orderBy('name')
-
-//         ->paginate(10)->withQueryString();
-
-//         if ($request->ajax()) {
-//         return view('admin.student.partials.table', compact('students'))->render();
-//     }
-
-//     return view('admin.student.index', [
-//         'students' => $students,
-//         'departments' => Department::orderBy('name')->get(),
-//         'sections' => Section::orderBy('name')->get(),
-//     ]);
-// }
-
-// public function index(Request $request)
-// {
-//     // dd($request);
-//     $currentYear = now()->year;
-
-//     $students = Student::with('department','section')
-
-//         ->when($request->search, function ($q) use ($request) {
-//             $q->where(function ($sub) use ($request) {
-//                 $sub->where('name','like',"%{$request->search}%")
-//                     ->orWhere('email','like',"%{$request->search}%")
-//                     ->orWhere('rollnum','like',"%{$request->search}%");
-//             });
-//         })
-
-//         ->when($request->department, fn($q) =>
-//             $q->where('department_id', $request->department)
-//         )
-
-//         ->when($request->section, fn($q) =>
-//             $q->where('section_id', $request->section)
-//         )
-
-//         /*  YEAR FILTER (WORKS AGAIN) */
-//         ->when($request->year, function ($q) use ($request, $currentYear) {
-
-//             if ($request->year == 'passout') {
-//                 $q->where('passout_year', '<', $currentYear);
-//             } else {
-//                 $q->whereRaw(
-//                     "(? - admission_year + 1) = ?",
-//                     [$currentYear, $request->year]
-//                 );
-//             }
-//         })
-
-//         /*  AUTO SORT BY YEAR LEVEL */
-//         ->orderByRaw("
-//             CASE
-//                 WHEN ? > passout_year THEN 5
-//                 ELSE (? - admission_year + 1)
-//             END ASC
-//         ", [$currentYear, $currentYear])
-
-//         ->orderBy('name')
-
-//         ->paginate(10)
-//         ->withQueryString();
-
-//     if ($request->ajax()) {
-//         return view('admin.student.partials.table', compact('students'))->render();
-//     }
-
-//     return view('admin.student.index', [
-//         'students' => $students,
-//         'departments' => Department::orderBy('name')->get(),
-//         'sections' => Section::orderBy('name')->get(),
-//     ]);
-// }
-
-//current working today 
-// public function index(Request $request)
-// {
-//     $now = now();
-
-//     // Academic year starts in July
-//     $academicYear = ($now->month >= 7) ? $now->year : $now->year - 1;
-
-//     $students = Student::with('department','section')
-
-//         // SEARCH
-//         ->when($request->search, function ($q) use ($request) {
-//             $q->where(function ($sub) use ($request) {
-//                 $sub->where('name','like',"%{$request->search}%")
-//                     ->orWhere('email','like',"%{$request->search}%")
-//                     ->orWhere('rollnum','like',"%{$request->search}%");
-//             });
-//         })
-
-//         // DEPARTMENT FILTER
-//         ->when($request->department, fn($q) =>
-//             $q->where('department_id', $request->department)
-//         )
-
-//         // SECTION FILTER
-//         ->when($request->section, fn($q) =>
-//             $q->where('section_id', $request->section)
-//         )
-
-//         // YEAR FILTER (ACADEMIC BASED)
-//         ->when($request->year, function ($q) use ($request, $academicYear) {
-
-//             if ($request->year == 'passout') {
-//                 $q->where('passout_year', '<=', $academicYear);
-//             } else {
-//                 $targetAdmissionYear = $academicYear - ($request->year - 1);
-//                 $q->where('admission_year', $targetAdmissionYear);
-//             }
-//         })
-
-//         // SORT BY STUDY YEAR PROPERLY
-//         ->orderByRaw("
-//             CASE
-//                 WHEN ? > passout_year THEN 5
-//                 ELSE (? - admission_year)
-//             END ASC
-//         ", [$academicYear, $academicYear])
-
-//         ->orderBy('name')
-
-//         ->paginate(10)
-//         ->withQueryString();
-
-//     if ($request->ajax()) {
-//         return view('admin.student.partials.table', compact('students'))->render();
-//     }
-
-//     return view('admin.student.index', [
-//         'students' => $students,
-//         'departments' => Department::orderBy('name')->get(),
-//         'sections' => Section::orderBy('name')->get(),
-//     ]);
-// }
 public function index(Request $request)
 {
     $students = Student::with('department', 'section')
@@ -297,7 +66,8 @@ public function index(Request $request)
 
         })
 
-        ->orderBy('name')
+        // ->orderBy('name')
+         ->orderBy('semester', 'asc')
         ->paginate(10)
         ->withQueryString();
 
@@ -322,51 +92,6 @@ public function index(Request $request)
 
     ]);
 }
-// public function index(Request $request)
-// {
-//     $currentYear = now()->year;
-
-//     // $students = Student::query()
-//     $students = Student::with('department','section')
-
-
-//         // SEARCH
-//         ->when($request->search, function ($q) use ($request) {
-//             $q->where(function ($sub) use ($request) {
-//                 $sub->where('name', 'like', "%{$request->search}%")
-//                     ->orWhere('email', 'like', "%{$request->search}%")
-//                     ->orWhere('rollnum', 'like', "%{$request->search}%");
-//             });
-//         })
-
-//         // FILTERS
-//         ->when($request->department, fn ($q) =>
-//             $q->where('department_id', $request->department)
-//         )
-
-//         ->when($request->section, fn ($q) =>
-//             $q->where('section_id', $request->section)
-//         )
-
-//         //  SMART YEAR ORDERING
-//         ->orderByRaw("
-//             CASE
-//                 WHEN ? < admission_year THEN 0
-//                 WHEN ? > passout_year THEN 5 
-//                 ELSE (? - admission_year) + 1
-//             END ASC
-//         ", [$currentYear, $currentYear, $currentYear])
-
-//         ->orderBy('name')
-
-//         ->paginate(10)
-//         ->withQueryString();
-
-//     return view('admin.student.index', compact('students'));
-// }
-
-
-
     // EXPORT EXCEL
     public function exportExcel(Request $request)
     {
@@ -409,8 +134,9 @@ public function index(Request $request)
     // Store student
     public function store(StoresStudentRequest $request)
     {
+        // dd($request);
         Student::create($request->validated());
-        
+        // dd(Student);
         if ($request->ajax()) {
             return response()->json(['success' => true]);
         }
@@ -474,24 +200,7 @@ public function index(Request $request)
         return view('admin.student.excel');
     }
 
-    // Import CSV / Excel
-    // public function import(Request $request)
-    // {
-    //     $request->validate([
-    //         'file' => 'required|mimes:csv,xlsx'
-    //     ]);
-
-    //     $import = new StudentsImport();
-    //     Excel::import($import, $request->file('file'));
-
-    //     return back()
-    // ->with('summary', [
-    //     'inserted' => $import->inserted,
-    //     'updated' => $import->updated,
-    // ])
-    // ->with('failures', $import->failures());
-
-    // }
+   
 public function import(Request $request)
 {
     // dd([
@@ -528,33 +237,6 @@ public function import(Request $request)
     {
         return $department->sections()->select('id','name')->get();
     }
-
-
-
-    // private function filteredStudents(Request $request)
-    // {
-    // return Student::with('department','section')
-
-    //     ->when($request->search, function ($q) use ($request) {
-    //         $q->where(function ($sub) use ($request) {
-    //             $sub->where('name','like',"%{$request->search}%")
-    //                 ->orWhere('email','like',"%{$request->search}%")
-    //                 ->orWhere('rollnum','like',"%{$request->search}%");
-    //         });
-    //     })
-
-    //     ->when($request->department, fn($q) =>
-    //         $q->where('department_id', $request->department)
-    //     )
-
-    //     ->when($request->section, fn($q) =>
-    //         $q->where('section_id', $request->section)
-    //     )
-
-    //     ->when($request->year, fn($q) =>
-    //         $q->where('admission_year', $request->year)
-    //     );
-    // }
 
 
     private function filteredStudents(Request $request)

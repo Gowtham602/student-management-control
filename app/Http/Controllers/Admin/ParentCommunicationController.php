@@ -43,6 +43,7 @@ class ParentCommunicationController extends Controller
         $templates = ParentMessageTemplate::where('status', true)
             ->orderBy('name')
             ->get();
+            
 
         return view(
             'admin.parent-communications.index',
