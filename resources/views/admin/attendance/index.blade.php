@@ -1,3 +1,4 @@
+
 @extends('layouts.admin')
 @section('title', 'Bulk Attendance')
 
@@ -16,22 +17,22 @@
 
 
                 <!-- <input type="date" name="date" value="{{ $date }}"
-                       class="border rounded-lg px-3 py-2"> -->
+                           class="border rounded-lg px-3 py-2"> -->
 
 
 
                 <!-- <select name="department" class="border rounded-lg px-3 py-2">
-                    <option value="">All Departments</option>
-                    @foreach($departments as $dept)
-                    <option value="{{ $dept->id }}" @selected(request('department')==$dept->id)>
-                        {{ $dept->name }}
-                    </option>
-                    @endforeach
-                </select> -->
+                        <option value="">All Departments</option>
+                        @foreach($departments as $dept)
+                        <option value="{{ $dept->id }}" @selected(request('department')==$dept->id)>
+                            {{ $dept->name }}
+                        </option>
+                        @endforeach
+                    </select> -->
 
 
                 <select name="department" id="department" class="border rounded-lg px-3 py-2">
-                    <option value="">All Departments</option>
+                    <option value="">Select Department</option>
                     @foreach($departments as $dept)
                         <option value="{{ $dept->id }}">
                             {{ $dept->name }}
@@ -49,13 +50,13 @@
 
 
                 <!-- <select name="section" class="border rounded-lg px-3 py-2">
-                    <option value="">All Sections</option>
-                    @foreach($sections as $sec)
-                    <option value="{{ $sec->id }}" @selected(request('section')==$sec->id)>
-                        {{ $sec->name }}
-                    </option>
-                    @endforeach
-                </select> -->
+                        <option value="">All Sections</option>
+                        @foreach($sections as $sec)
+                        <option value="{{ $sec->id }}" @selected(request('section')==$sec->id)>
+                            {{ $sec->name }}
+                        </option>
+                        @endforeach
+                    </select> -->
                 <select name="section" id="section" class="border rounded-lg px-3 py-2" disabled>
                     <option value="">Select Department First</option>
                 </select>
@@ -67,8 +68,8 @@
 
 
                 <!-- <button class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2 font-medium">
-                    Filter
-                </button> -->
+                        Filter
+                    </button> -->
 
             </form>
         </div>
@@ -89,29 +90,36 @@
                     <input type="hidden" name="department" id="hiddenDepartment">
                     <input type="hidden" name="section" id="hiddenSection">
                     <input type="hidden" name="year" id="hiddenYear">
+
                     <div>
-                        <label class="text-xs text-gray-500 block">Attendance Date</label>
-                        <!-- <input type="date" name="date" value="{{ $date }}" -->
+                        <label class="text-xs text-gray-500 block">
+                            Attendance Date
+                        </label>
+
                         <input type="date" name="date" value="{{ old('date', now()->format('Y-m-d')) }}"
                             max="{{ now()->format('Y-m-d') }}" class="border rounded-lg px-3 py-2 font-semibold" required>
                     </div>
 
-                    <!-- <div>
-                        <label class="text-xs text-gray-500 block">Status</label>
-                        <select 
-                            class="border rounded-lg px-4 py-2 font-semibold">
-                            <option value="P"> Present</option>
-                            <option value="A">Absent</option>
-                            <option value="H"> Holiday</option>
-                        </select>
-                    </div> -->
 
-                    <div class="mt-4 md:mt-0">
-                        <button type="submit"
-                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-semibold shadow">
-                            Save Attendance
-                        </button>
-                    </div>
+                    @if(!$attendanceExists)
+
+                        <div class="mt-4 md:mt-0">
+                            <button type="submit" id="saveAttendanceBtn"
+                                class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-semibold shadow">
+                                Save Attendance
+                            </button>
+                        </div>
+
+                    @else
+
+                        <div class="mt-4 md:mt-0">
+                            <button type="button" disabled
+                                class="bg-gray-400 text-white px-6 py-2 rounded-lg font-semibold cursor-not-allowed">
+                                Attendance Locked
+                            </button>
+                        </div>
+
+                    @endif
 
                 </div>
                 @if($attendanceExists)
@@ -155,21 +163,21 @@
                                 </tr>
                             </thead>
 
-                                <tbody id="studentsTable" class="divide-y">
-                    
-                                    @forelse($students as $student)
+                            <tbody id="studentsTable" class="divide-y">
 
-                                        @php
-                                            $yearLabel = $student->study_year;
-                                        @endphp
+                                @forelse($students as $student)
 
-                                        <tr class="hover:bg-indigo-50 transition">
+                                    @php
+                                        $yearLabel = $student->study_year;
+                                    @endphp
 
-                                            <td class="px-4 py-3 text-center">
-                                                <input type="checkbox" value="{{ $student->id }}" data-name="{{ $student->name }}"
-                                                    data-department="{{ $student->department->name ?? '-' }}"
-                                                    data-year="{{ $yearLabel }}" class="student-check w-4 h-4 rounded border-gray-300">
-                                            </td>
+                                    <tr class="hover:bg-indigo-50 transition">
+
+                                        <td class="px-4 py-3 text-center">
+                                            <input type="checkbox" value="{{ $student->id }}" data-name="{{ $student->name }}"
+                                                data-department="{{ $student->department->name ?? '-' }}"
+                                                data-year="{{ $yearLabel }}" class="student-check w-4 h-4 rounded border-gray-300">
+                                        </td>
 
                                         <td class="px-4 py-3">
                                             {{ $student->rollnum }}
@@ -221,43 +229,33 @@
 @endsection
 
 @push('scripts')
-    <!-- <script>
-        let selectedStudents = new Set();
-        // let selectedStudents = {};  
-        console.log(selectedStudents, "_____new select student");
+
+    <script>
+
+        let selectedStudents = {};
 
         const search = document.querySelector('input[name="search"]');
         const department = document.getElementById('department');
         const section = document.getElementById('section');
         const year = document.querySelector('select[name="year"]');
 
+        const attendanceForm = document.getElementById('attendanceForm');
+
         let timer;
 
-        //  Load students via AJAX
-        // function loadStudents() {
-        //     const params = new URLSearchParams({
-        //         search: search.value,
-        //         department: department.value,
-        //         section: section.value,
-        //         year: year.value,
-        //     });
 
-        //     fetch(`{{ route('admin.attendance.ajaxStudents') }}?${params}`)
-        //         .then(res => res.text())
-        //         .then(html => {
-        //             document.getElementById('studentsTable').innerHTML = html;
-        //         });
-        //                 //  Re-check selected students
-        //             document.querySelectorAll('.student-check').forEach(cb => {
-        //                 if (selectedStudents.has(cb.value)) {
-        //                     cb.checked = true;
-        //                 }
-        //             });
+        /*
+        |--------------------------------------------------------------------------
+        | LOAD STUDENTS
+        |--------------------------------------------------------------------------
+        */
 
-
-
-        // }
         function loadStudents() {
+
+            if (!department.value || !section.value || !year.value) {
+                return;
+            }
+
             const params = new URLSearchParams({
                 search: search.value,
                 department: department.value,
@@ -267,164 +265,284 @@
             });
 
             fetch(`{{ route('admin.attendance.ajaxStudents') }}?${params}`)
-                .then(res => res.text())
-                .then(html => {
+                .then(res => res.json())
+                .then(data => {
 
-                    document.getElementById('studentsTable').innerHTML = html;
+                    // Load students/table
+                    document.getElementById('studentsTable').innerHTML = data.html;
 
-                    //  Re-check selected students AFTER table reload
+                    // Get Save button
+                    const saveButton =
+                        document.getElementById('saveAttendanceBtn');
+
+                    // ==============================
+                    // ATTENDANCE ALREADY EXISTS
+                    // ==============================
+
+                    if (data.attendanceExists === true) {
+
+                        saveButton.disabled = true;
+
+                        saveButton.type = 'button';
+
+                        saveButton.innerText = 'Attendance Locked';
+
+                        saveButton.classList.remove(
+                            'bg-emerald-600',
+                            'hover:bg-emerald-700'
+                        );
+
+                        saveButton.classList.add(
+                            'bg-gray-400',
+                            'cursor-not-allowed'
+                        );
+
+                    }
+
+                    // ==============================
+                    // ATTENDANCE NOT EXISTS
+                    // ==============================
+
+                    else {
+
+                        saveButton.disabled = false;
+
+                        saveButton.type = 'submit';
+
+                        saveButton.innerText = 'Save Attendance';
+
+                        saveButton.classList.remove(
+                            'bg-gray-400',
+                            'cursor-not-allowed'
+                        );
+
+                        saveButton.classList.add(
+                            'bg-emerald-600',
+                            'hover:bg-emerald-700'
+                        );
+                    }
+
+                    // Keep selected students checked
                     document.querySelectorAll('.student-check').forEach(cb => {
+
                         if (selectedStudents[cb.value]) {
                             cb.checked = true;
                         }
+
                     });
+
+                })
+                .catch(error => {
+
+                    console.error(
+                        'Attendance AJAX Error:',
+                        error
+                    );
 
                 });
         }
+       /*
+|--------------------------------------------------------------------------
+| DEPARTMENT → SECTION attendance bulk attendance select department nd load section
+|--------------------------------------------------------------------------
+*/
 
 
-        const attendanceForm = document.getElementById('attendanceForm');
+department.addEventListener('change', function () {
 
-        attendanceForm.addEventListener('submit', function (e) {
+    const deptId = this.value;
 
-            e.preventDefault(); // Stop default submit
+    section.innerHTML =
+        '<option value="">Loading...</option>';
 
-            //  Validate Filters
-            if (!department.value) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Please select Department'
-                });
-                return;
-            }
+    section.disabled = true;
 
-            if (!section.value) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Please select Section'
-                });
-                return;
-            }
+    if (!deptId) {
 
-            if (!year.value) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Please select Year'
-                });
-                return;
-            }
+        section.innerHTML =
+            '<option value="">Select Department First</option>';
 
-            let absentCount = Object.keys(selectedStudents).length;
+        document.getElementById('studentsTable').innerHTML = '';
 
-            Swal.fire({
-                title: 'Confirm Attendance',
-                html: `
-                <div style="text-align:left">
-                    <p><b>Absent Students:</b> ${absentCount}</p>
-                    <p><b>Present Students:</b> Remaining students</p>
-                    <br>
-                    <p>Are you sure you want to mark remaining students as <b>Present</b>?</p>
-                </div>
-            `,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#16a34a',
-                cancelButtonColor: '#ef4444',
-                confirmButtonText: 'Yes, Confirm',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
+        return;
+    }
 
-                if (result.isConfirmed) {
+    const url =
+        "{{ route('admin.departments.sections', ['department' => '__ID__']) }}"
+            .replace('__ID__', deptId);
 
-                    Swal.fire({
-                        title: 'Saving Attendance...',
-                        html: 'Please wait while attendance is being processed.',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
+    console.log('SECTION URL:', url);
 
-                    // Send filter values
-                    document.getElementById('hiddenDepartment').value = department.value;
-                    document.getElementById('hiddenSection').value = section.value;
-                    document.getElementById('hiddenYear').value = year.value;
+    fetch(url, {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(res => {
 
-                    // Remove old hidden students
-                    attendanceForm.querySelectorAll('.hidden-student')
-                        .forEach(el => el.remove());
+        console.log('SECTION STATUS:', res.status);
 
-                    // Add selected students (ABSENT)
-                    Object.keys(selectedStudents).forEach(id => {
-                        let input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = 'students[]';
-                        input.value = id;
-                        input.classList.add('hidden-student');
-                        attendanceForm.appendChild(input);
-                    });
+        if (!res.ok) {
+            throw new Error('HTTP ' + res.status);
+        }
 
-                    attendanceForm.submit(); //  Final submit
-                }
+        return res.json();
+    })
+    .then(data => {
 
-            });
+        console.log('SECTIONS:', data);
+
+        section.innerHTML =
+            '<option value="">Select Section</option>';
+
+        data.forEach(sec => {
+
+            section.innerHTML +=
+                `<option value="${sec.id}">
+                    ${sec.name}
+                </option>`;
+        });
+
+        section.disabled = false;
+    })
+    .catch(error => {
+
+        console.error('SECTION ERROR:', error);
+
+        section.innerHTML =
+            '<option value="">Unable to load sections</option>';
+
+        section.disabled = true;
+    });
+
+});
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SECTION CHANGE
+        |--------------------------------------------------------------------------
+        */
+
+        section.addEventListener('change', function () {
+
+            loadStudents();
 
         });
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | YEAR CHANGE
+        |--------------------------------------------------------------------------
+        */
 
-        // // Send filter values
-        // document.getElementById('hiddenDepartment').value = department.value;
-        // document.getElementById('hiddenSection').value = section.value;
-        // document.getElementById('hiddenYear').value = year.value;
+        year.addEventListener('change', function () {
 
-        // // Remove old hidden students
-        // document.querySelectorAll('.hidden-student')
-        //     .forEach(e => e.remove());
+            loadStudents();
 
-        // // Add selected students
-        // Object.keys(selectedStudents).forEach(id => {
-
-        //     let input = document.createElement('input');
-        //     input.type = 'hidden';
-        //     input.name = 'students[]';
-        //     input.value = id;
-        //     input.classList.add('hidden-student');
-
-        //     this.appendChild(input);
-        // });
-
-        // });
+        });
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | SEARCH
+        |--------------------------------------------------------------------------
+        */
 
-        // function updateSelectedPreview() {
-        //     const preview = document.getElementById('selectedPreview');
-        //     const count   = document.getElementById('selectedCount');
+        search.addEventListener('keyup', function () {
 
-        //     preview.innerHTML = '';
+            clearTimeout(timer);
 
-        //     selectedStudents.forEach(id => {
+            timer = setTimeout(function () {
 
-        //         const badge = document.createElement('div');
-        //         badge.className =
-        //             "px-3 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full flex items-center gap-2";
+                loadStudents();
 
-        //         badge.innerHTML = `
-        //             ID: ${id}
-        //             <button type="button"
-        //                 class="remove-btn text-red-500 font-bold"
-        //                 data-id="${id}">
-        //                 ×
-        //             </button>
-        //         `;
+            }, 400);
 
-        //         preview.appendChild(badge);
-        //     });
+        });
 
-        //     count.innerText = selectedStudents.size;
-        // }
 
+        /*
+        |--------------------------------------------------------------------------
+        | CHECK ALL
+        |--------------------------------------------------------------------------
+        */
+
+        document.getElementById('checkAll').addEventListener('change', function () {
+
+            const checked = this.checked;
+
+            document.querySelectorAll('.student-check').forEach(cb => {
+
+                cb.checked = checked;
+
+                const id = cb.value;
+
+                if (checked) {
+
+                    selectedStudents[id] = {
+
+                        name: cb.dataset.name,
+                        department: cb.dataset.department,
+                        year: cb.dataset.year
+
+                    };
+
+                } else {
+
+                    delete selectedStudents[id];
+
+                }
+
+            });
+
+            updateSelectedPreview();
+
+        });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | INDIVIDUAL STUDENT CHECKBOX
+        |--------------------------------------------------------------------------
+        */
+
+        document.addEventListener('change', function (e) {
+
+            if (!e.target.classList.contains('student-check')) {
+                return;
+            }
+
+            const id = e.target.value;
+
+            if (e.target.checked) {
+
+                selectedStudents[id] = {
+
+                    name: e.target.dataset.name,
+                    department: e.target.dataset.department,
+                    year: e.target.dataset.year
+
+                };
+
+            } else {
+
+                delete selectedStudents[id];
+
+            }
+
+            updateSelectedPreview();
+
+        });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PREVIEW
+        |--------------------------------------------------------------------------
+        */
 
         function updateSelectedPreview() {
 
@@ -438,604 +556,196 @@
                 const student = selectedStudents[id];
 
                 const badge = document.createElement('div');
+
                 badge.className =
-                    "px-3 py-2 bg-indigo-100 text-indigo-800 text-xs rounded-xl flex items-center gap-3 shadow-sm";
+                    'px-3 py-2 bg-indigo-100 text-indigo-800 text-xs rounded-xl';
 
                 badge.innerHTML = `
-                <div>
-                    <div class="font-semibold">${student.name}</div>
-                    <div class="text-[11px] text-gray-600">
-                        ${student.department} • ${student.year}
-                    </div>
-                </div>
-
-                <button type="button"
-                    class="remove-btn text-red-500 font-bold ml-2"
-                    data-id="${id}">
-                    ×
-                </button>
+                <b>${student.name}</b>
+                <span class="text-gray-500">
+                    ${student.department} • ${student.year}
+                </span>
             `;
 
                 preview.appendChild(badge);
+
             });
 
-            count.innerText = Object.keys(selectedStudents).length;
+            count.innerText =
+                Object.keys(selectedStudents).length;
+
         }
 
 
-        //  Auto search
-        search.addEventListener('keyup', () => {
-            clearTimeout(timer);
-            timer = setTimeout(loadStudents, 400);
-        });
+        /*
+        |--------------------------------------------------------------------------
+        | SAVE BULK ATTENDANCE
+        |--------------------------------------------------------------------------
+        */
 
-        //  Filters
-        // department.addEventListener('change', loadStudents);
-        search.addEventListener('keyup', () => {
-            clearTimeout(timer);
-            timer = setTimeout(loadStudents, 400);
-        });
+        attendanceForm.addEventListener('submit', function (e) {
 
-        section.addEventListener('change', loadStudents);
-        year.addEventListener('change', loadStudents);
+            e.preventDefault();
 
-        department.addEventListener('change', function () {
 
-            const deptId = this.value;
+            if (!department.value) {
 
-            section.innerHTML = '<option>Loading...</option>';
-            section.disabled = true;
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Please select Department'
+                });
 
-            if (!deptId) {
-                section.innerHTML = '<option value="">All Sections</option>';
-                section.disabled = true;
-
-                loadStudents(); //  reload students when cleared
                 return;
             }
 
-            fetch(`/admin/departments/${deptId}/sections`)
-                .then(res => res.json())
-                .then(data => {
 
-                    section.innerHTML = '<option value="">All Sections</option>';
+            if (!section.value) {
 
-                    data.forEach(sec => {
-                        section.innerHTML +=
-                            `<option value="${sec.id}">${sec.name}</option>`;
-                    });
-
-                    section.disabled = false;
-
-                    loadStudents(); //  LOAD AFTER sections ready
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Please select Section'
                 });
 
-        });
-        search.disabled = true;
-
-        department.addEventListener('change', function () {
-
-            if (this.value) {
-                search.disabled = false;
-            } else {
-                search.disabled = true;
-                document.getElementById('studentsTable').innerHTML =
-                    `<tr>
-                    <td colspan="6" class="text-center py-6 text-gray-400">
-                        Please select a filter to view students
-                    </td>
-                </tr>`;
-            }
-        });
-
-
-        section.addEventListener('change', loadStudents);
-        year.addEventListener('change', loadStudents);
-
-        //  Department → Section
-        department.addEventListener('change', function () {
-            const deptId = this.value;
-
-            section.innerHTML = '<option>Loading...</option>';
-            section.disabled = true;
-
-            if (!deptId) {
-                section.innerHTML = '<option>Select Department First</option>';
                 return;
             }
 
-            fetch(`/admin/departments/${deptId}/sections`)
-                .then(res => res.json())
-                .then(data => {
-                    section.innerHTML = '<option value="">All Sections</option>';
-                    data.forEach(sec => {
-                        section.innerHTML +=
-                            `<option value="${sec.id}">${sec.name}</option>`;
-                    });
-                    section.disabled = false;
+
+            if (!year.value) {
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Please select Year'
                 });
-        });
 
-        //  Check all
-        // document.getElementById('checkAll').addEventListener('change', function () {
-        //     document.querySelectorAll('.student-check')
-        //         .forEach(cb => cb.checked = this.checked);
-        // });
-        document.getElementById('checkAll').addEventListener('change', function () {
-
-            document.querySelectorAll('.student-check').forEach(cb => {
-
-                cb.checked = this.checked;
-
-                const id = cb.value;
-
-                if (this.checked) {
-
-                    selectedStudents[id] = {
-                        name: cb.dataset.name,
-                        department: cb.dataset.department,
-                        year: cb.dataset.year
-                    };
-
-                } else {
-
-                    delete selectedStudents[id];
-
-                }
-
-            });
-
-            updateSelectedPreview();
-        });
-
-
-
-
-        // Handle checkbox click
-        // document.addEventListener('change', function (e) {
-        //     if (e.target.classList.contains('student-check')) {
-        //         const studentId = e.target.value;
-
-        //         if (e.target.checked) {
-        //             selectedStudents.add(studentId);
-        //         } else {
-        //             selectedStudents.delete(studentId);
-        //         }
-        //         updateSelectedPreview();
-        //     }
-        // });
-
-        document.addEventListener('change', function (e) {
-
-            if (e.target.classList.contains('student-check')) {
-
-                const id = e.target.value;
-
-                if (e.target.checked) {
-
-                    selectedStudents[id] = {
-                        name: e.target.dataset.name,
-                        department: e.target.dataset.department,
-                        year: e.target.dataset.year
-                    };
-
-                } else {
-
-                    delete selectedStudents[id];
-
-                }
-
-                updateSelectedPreview();
+                return;
             }
 
-        });
-    </script> -->
-<script>
 
-let selectedStudents = {};
-
-const search = document.querySelector('input[name="search"]');
-const department = document.getElementById('department');
-const section = document.getElementById('section');
-const year = document.querySelector('select[name="year"]');
-
-const attendanceForm = document.getElementById('attendanceForm');
-
-let timer;
+            const absentCount =
+                Object.keys(selectedStudents).length;
 
 
-/*
-|--------------------------------------------------------------------------
-| LOAD STUDENTS
-|--------------------------------------------------------------------------
-*/
+            Swal.fire({
 
-function loadStudents() {
+                title: 'Confirm Attendance',
 
-    if (!department.value || !section.value || !year.value) {
-        return;
-    }
+                html: `
+                <div style="text-align:left">
+                    <p>
+                        <b>Absent Students:</b>
+                        ${absentCount}
+                    </p>
 
-    const params = new URLSearchParams({
-        search: search.value,
-        department: department.value,
-        section: section.value,
-        year: year.value,
-        date: document.querySelector('input[name="date"]').value
-    });
+                    <p>
+                        <b>Present Students:</b>
+                        Remaining students
+                    </p>
 
-    fetch(`{{ route('admin.attendance.ajaxStudents') }}?${params}`)
-        .then(res => res.text())
-        .then(html => {
+                    <br>
 
-            document.getElementById('studentsTable').innerHTML = html;
+                    <p>
+                        Are you sure you want to mark
+                        remaining students as
+                        <b>Present</b>?
+                    </p>
+                </div>
+            `,
 
-            // Keep previously selected students checked
-            document.querySelectorAll('.student-check').forEach(cb => {
+                icon: 'question',
 
-                if (selectedStudents[cb.value]) {
-                    cb.checked = true;
+                showCancelButton: true,
+
+                confirmButtonText: 'Yes, Confirm',
+
+                cancelButtonText: 'Cancel'
+
+            }).then((result) => {
+
+                if (!result.isConfirmed) {
+                    return;
                 }
 
+                Swal.fire({
+                    title: 'Saving Attendance...',
+                    html: `
+                <div style="text-align:center;">
+                    <p>
+                        Please wait while attendance is being processed.
+                    </p>
+
+                    <p style="margin-top:10px;">
+                        📩 <b>Sending absence message to parents...</b>
+                    </p>
+                </div>
+            `,
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                /*
+                |--------------------------------------------------------------------------
+                | FILTER VALUES
+                |--------------------------------------------------------------------------
+                */
+
+                document.getElementById('hiddenDepartment').value =
+                    department.value;
+
+                document.getElementById('hiddenSection').value =
+                    section.value;
+
+                document.getElementById('hiddenYear').value =
+                    year.value;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | REMOVE OLD HIDDEN INPUTS
+                |--------------------------------------------------------------------------
+                */
+
+                attendanceForm
+                    .querySelectorAll('.hidden-student')
+                    .forEach(el => el.remove());
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | ADD ABSENT STUDENTS
+                |--------------------------------------------------------------------------
+                */
+
+                Object.keys(selectedStudents).forEach(id => {
+
+                    const input =
+                        document.createElement('input');
+
+                    input.type = 'hidden';
+
+                    input.name = 'students[]';
+
+                    input.value = id;
+
+                    input.classList.add('hidden-student');
+
+                    attendanceForm.appendChild(input);
+
+                });
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | SUBMIT
+                |--------------------------------------------------------------------------
+                */
+
+                attendanceForm.submit();
+
             });
 
         });
-}
 
-
-/*
-|--------------------------------------------------------------------------
-| DEPARTMENT → SECTION
-|--------------------------------------------------------------------------
-*/
-
-department.addEventListener('change', function () {
-
-    const deptId = this.value;
-
-    section.innerHTML = '<option value="">Loading...</option>';
-    section.disabled = true;
-
-    if (!deptId) {
-
-        section.innerHTML =
-            '<option value="">Select Department First</option>';
-
-        document.getElementById('studentsTable').innerHTML = '';
-
-        return;
-    }
-
-    fetch(`/admin/departments/${deptId}/sections`)
-        .then(res => res.json())
-        .then(data => {
-
-            section.innerHTML =
-                '<option value="">Select Section</option>';
-
-            data.forEach(sec => {
-
-                section.innerHTML +=
-                    `<option value="${sec.id}">${sec.name}</option>`;
-
-            });
-
-            section.disabled = false;
-
-        });
-
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| SECTION CHANGE
-|--------------------------------------------------------------------------
-*/
-
-section.addEventListener('change', function () {
-
-    loadStudents();
-
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| YEAR CHANGE
-|--------------------------------------------------------------------------
-*/
-
-year.addEventListener('change', function () {
-
-    loadStudents();
-
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| SEARCH
-|--------------------------------------------------------------------------
-*/
-
-search.addEventListener('keyup', function () {
-
-    clearTimeout(timer);
-
-    timer = setTimeout(function () {
-
-        loadStudents();
-
-    }, 400);
-
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| CHECK ALL
-|--------------------------------------------------------------------------
-*/
-
-document.getElementById('checkAll').addEventListener('change', function () {
-
-    const checked = this.checked;
-
-    document.querySelectorAll('.student-check').forEach(cb => {
-
-        cb.checked = checked;
-
-        const id = cb.value;
-
-        if (checked) {
-
-            selectedStudents[id] = {
-
-                name: cb.dataset.name,
-                department: cb.dataset.department,
-                year: cb.dataset.year
-
-            };
-
-        } else {
-
-            delete selectedStudents[id];
-
-        }
-
-    });
-
-    updateSelectedPreview();
-
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| INDIVIDUAL STUDENT CHECKBOX
-|--------------------------------------------------------------------------
-*/
-
-document.addEventListener('change', function (e) {
-
-    if (!e.target.classList.contains('student-check')) {
-        return;
-    }
-
-    const id = e.target.value;
-
-    if (e.target.checked) {
-
-        selectedStudents[id] = {
-
-            name: e.target.dataset.name,
-            department: e.target.dataset.department,
-            year: e.target.dataset.year
-
-        };
-
-    } else {
-
-        delete selectedStudents[id];
-
-    }
-
-    updateSelectedPreview();
-
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| PREVIEW
-|--------------------------------------------------------------------------
-*/
-
-function updateSelectedPreview() {
-
-    const preview = document.getElementById('selectedPreview');
-    const count = document.getElementById('selectedCount');
-
-    preview.innerHTML = '';
-
-    Object.keys(selectedStudents).forEach(id => {
-
-        const student = selectedStudents[id];
-
-        const badge = document.createElement('div');
-
-        badge.className =
-            'px-3 py-2 bg-indigo-100 text-indigo-800 text-xs rounded-xl';
-
-        badge.innerHTML = `
-            <b>${student.name}</b>
-            <span class="text-gray-500">
-                ${student.department} • ${student.year}
-            </span>
-        `;
-
-        preview.appendChild(badge);
-
-    });
-
-    count.innerText =
-        Object.keys(selectedStudents).length;
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| SAVE BULK ATTENDANCE
-|--------------------------------------------------------------------------
-*/
-
-attendanceForm.addEventListener('submit', function (e) {
-
-    e.preventDefault();
-
-
-    if (!department.value) {
-
-        Swal.fire({
-            icon: 'warning',
-            title: 'Please select Department'
-        });
-
-        return;
-    }
-
-
-    if (!section.value) {
-
-        Swal.fire({
-            icon: 'warning',
-            title: 'Please select Section'
-        });
-
-        return;
-    }
-
-
-    if (!year.value) {
-
-        Swal.fire({
-            icon: 'warning',
-            title: 'Please select Year'
-        });
-
-        return;
-    }
-
-
-    const absentCount =
-        Object.keys(selectedStudents).length;
-
-
-    Swal.fire({
-
-        title: 'Confirm Attendance',
-
-        html: `
-            <div style="text-align:left">
-                <p>
-                    <b>Absent Students:</b>
-                    ${absentCount}
-                </p>
-
-                <p>
-                    <b>Present Students:</b>
-                    Remaining students
-                </p>
-
-                <br>
-
-                <p>
-                    Are you sure you want to mark
-                    remaining students as
-                    <b>Present</b>?
-                </p>
-            </div>
-        `,
-
-        icon: 'question',
-
-        showCancelButton: true,
-
-        confirmButtonText: 'Yes, Confirm',
-
-        cancelButtonText: 'Cancel'
-
-    }).then((result) => {
-
-        if (!result.isConfirmed) {
-            return;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | FILTER VALUES
-        |--------------------------------------------------------------------------
-        */
-
-        document.getElementById('hiddenDepartment').value =
-            department.value;
-
-        document.getElementById('hiddenSection').value =
-            section.value;
-
-        document.getElementById('hiddenYear').value =
-            year.value;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | REMOVE OLD HIDDEN INPUTS
-        |--------------------------------------------------------------------------
-        */
-
-        attendanceForm
-            .querySelectorAll('.hidden-student')
-            .forEach(el => el.remove());
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | ADD ABSENT STUDENTS
-        |--------------------------------------------------------------------------
-        */
-
-        Object.keys(selectedStudents).forEach(id => {
-
-            const input =
-                document.createElement('input');
-
-            input.type = 'hidden';
-
-            input.name = 'students[]';
-
-            input.value = id;
-
-            input.classList.add('hidden-student');
-
-            attendanceForm.appendChild(input);
-
-        });
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUBMIT
-        |--------------------------------------------------------------------------
-        */
-
-        attendanceForm.submit();
-
-    });
-
-});
-
-</script>
+    </script>
 @endpush

@@ -19,7 +19,7 @@
             <div class="leading-tight min-w-0">
 
                 <span class="block text-lg font-bold text-gray-800 truncate">
-                    Nursing
+                    TSACBON
                 </span>
 
                 <span class="block text-xs text-gray-500 truncate">
@@ -142,7 +142,7 @@
     </svg>
 
     <span class="text-sm font-medium">
-        Parent Communication
+        Parent Meeting Templated
     </span>
 
 </a>

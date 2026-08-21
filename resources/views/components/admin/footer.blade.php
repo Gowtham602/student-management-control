@@ -4,7 +4,7 @@
         <p>
             © {{ date('Y') }}
             <span class="font-semibold text-gray-700">
-               Jaya College of Nursing
+             THE SALVATION ARMY CATHERINE BOOTH COLLEGE OF NURSING
             </span>
             . All Rights Reserved.
         </p>

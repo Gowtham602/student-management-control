@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Parent Communication')
+@section('title', 'Parent Meeting Template')
 
 @section('content')
 
@@ -9,7 +9,7 @@
     {{-- Page Header --}}
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-800">
-            Parent Communication
+            Parent Meeting Template
         </h1>
 
         <p class="text-sm text-gray-500 mt-1">
@@ -24,7 +24,7 @@
         <div class="px-6 py-4 border-b border-gray-200">
 
             <h2 class="text-lg font-semibold text-gray-800">
-                Create Communication
+                Create Template
             </h2>
 
             <p class="text-sm text-gray-500 mt-1">

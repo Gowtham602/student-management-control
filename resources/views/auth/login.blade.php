@@ -96,11 +96,11 @@
 
                         <div>
                             <h1 class="text-xl font-bold tracking-wide">
-                               Jaya College of Nursing
+                               THE SALVATION ARMY CATHERINE BOOTH 
                             </h1>
 
                             <p class="text-sm text-white/75">
-                                Nursing College
+                                COLLEGE OF NURSING
                             </p>
                         </div>
 
@@ -225,12 +225,13 @@
                         </div> -->
 
                         <h1 class="mt-4 text-xl font-bold text-gray-900">
-                            Jaya College of Nursing
+                            THE SALVATION ARMY CATHERINE BOOTH
                         </h1>
 
                         <p class="text-sm text-gray-500">
-                            Nursing College ERP
+                           COLLEGE OF NURSING
                         </p>
+
 
                     </div>
 
@@ -480,7 +481,7 @@
                         </p>
 
                         <p class="mt-1 text-xs text-gray-400">
-                            Nursing College Management System
+                            TSACBON Management System
                         </p>
 
                     </div>

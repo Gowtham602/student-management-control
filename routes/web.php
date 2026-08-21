@@ -64,8 +64,8 @@ Route::middleware(['auth', 'role:admin'])
     Route::resource('departments', DepartmentController::class);
     Route::resource('sections', SectionController::class);
 
-    Route::get('/departments/{department}/sections',
-        [StudentController::class, 'departmentfetch']);
+    // Route::get('/departments/{department}/sections',
+    //     [StudentController::class, 'departmentfetch']);
 
     /*
     |--------------------------------------------------------------------------
