@@ -27,6 +27,8 @@ return [
 
         't_id' => env('SMS_T_ID'),
 
+        'te_id' => env('SMS_TE_ID'),
+
     ],
 
     'mailgun' => [

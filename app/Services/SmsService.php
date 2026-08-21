@@ -31,6 +31,7 @@ class SmsService
                 'priority' => config('services.sms.priority'),
                 'e_id' => config('services.sms.e_id'),
                 't_id' => $templateId,
+                'te_id' => config('services.sms.te_id')
             ];
 
             Log::info('Ideal SMS Request', [

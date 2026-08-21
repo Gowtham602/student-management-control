@@ -400,11 +400,11 @@ class AttendanceController extends Controller
                 |--------------------------------------------------------------------------
                 */
 
-                $otp = null;
+                // $otp = null;
 
-                if ($status === 'A') {
-                    $otp = rand(100000, 999999);
-                }
+                // if ($status === 'A') {
+                //     $otp = rand(100000, 999999);
+                // }
 
 
                 /*
@@ -413,11 +413,16 @@ class AttendanceController extends Controller
                 |--------------------------------------------------------------------------
                 */
 
+                // $attendance = Attendance::create([
+                //     'student_id' => $student->id,
+                //     'date' => $request->date,
+                //     'status' => $status,
+                //     'otp' => $otp,
+                // ]);
                 $attendance = Attendance::create([
                     'student_id' => $student->id,
                     'date' => $request->date,
                     'status' => $status,
-                    'otp' => $otp,
                 ]);
                 Log::info('BULK ATTENDANCE SAVED', [
                     'attendance_id' => $attendance->id,
@@ -433,19 +438,61 @@ class AttendanceController extends Controller
                 |--------------------------------------------------------------------------
                 */
 
-                if (
-                    $status === 'A' &&
-                    !empty($student->father_phone)
-                ) {
+                // if (
+                //     $status === 'A' &&
+                //     !empty($student->father_phone)
+                // ) {
 
-                    $message =
-                        "{$otp} Please use this OTP {$otp} for your registration.IDLSMS";
+                //     $message =
+                //         "{$otp} Please use this OTP {$otp} for your registration.IDLSMS";
 
-                    SmsService::send(
-                        $student->father_phone,
-                        $message
-                    );
-                }
+                //     SmsService::send(
+                //         $student->father_phone,
+                //         $message
+                //     );
+                // }
+                /*
+|--------------------------------------------------------------------------
+| DLT ABSENCE SMS
+|--------------------------------------------------------------------------
+*/
+
+if (
+    $status === 'A' &&
+    !empty($student->father_phone)
+) {
+
+    $date = \Carbon\Carbon::parse($request->date)
+        ->format('d-m-Y');
+
+    /*
+    |--------------------------------------------------------------------------
+    | IMPORTANT:
+    | Keep this text exactly matching the DLT-approved template.
+    |--------------------------------------------------------------------------
+    */
+
+    $message =
+        "Dear Parent,\n" .
+        "your ward Name:{$student->name} is absent on Date:{$date}\n" .
+        "TSACBCON\n" .
+        "Principal\n" .
+        "IDEAL";
+
+    Log::info('ABSENCE DLT SMS', [
+        'student_id' => $student->id,
+        'student_name' => $student->name,
+        'phone' => $student->father_phone,
+        'date' => $date,
+        'template_id' => config('services.sms.te_id'),
+    ]);
+
+    SmsService::send(
+        $student->father_phone,
+        $message,
+        config('services.sms.te_id')
+    );
+}
             }
 
             Log::info('========== BULK ATTENDANCE SUCCESS ==========', [
@@ -489,77 +536,189 @@ class AttendanceController extends Controller
     }
 
 
+    // public function update(Request $request)
+    // {
+    //     Log::info('========== DAY ATTENDANCE UPDATE ==========', [
+    //         'user_id' => auth()->id(),
+    //         'student_id' => $request->student_id,
+    //         'date' => $request->date,
+    //         'status' => $request->status,
+    //     ]);
+    //     DB::beginTransaction();
+
+    //     try {
+
+    //         $attendance = Attendance::updateOrCreate(
+    //             [
+    //                 'student_id' => $request->student_id,
+    //                 'date' => $request->date
+    //             ],
+    //             [
+    //                 'status' => $request->status
+    //             ]
+    //         );
+    //         Log::info('DAY ATTENDANCE SAVED', [
+    //             'attendance_id' => $attendance->id,
+    //             'student_id' => $request->student_id,
+    //             'date' => $request->date,
+    //             'status' => $request->status,
+    //             'user_id' => auth()->id(),
+    //         ]);
+    //         // If Absent → Generate OTP + Send SMS
+    //         if ($request->status === 'A') {
+
+    //             $student = Student::find($request->student_id);
+
+    //             if ($student && !empty($student->father_phone)) {
+
+    //                 $otp = rand(100000, 999999);
+
+    //                 // Save OTP
+    //                 $attendance->update([
+    //                     'otp' => $otp
+    //                 ]);
+
+    //                 //  message || ${otp} Please use this OTP ${otp} for your registration.IDLSMS,
+    //                 $message = "{$otp} Please use this OTP {$otp} for your registration.IDLSMS";
+    //                 // $message = "Please use this OTP {$otp} for absence confirmation. IDLSMS";
+
+    //                 SmsService::send($student->father_phone, $message);
+    //             }
+    //         }
+
+    //         DB::commit();
+
+    //         return back()->with('success', 'Attendance Updated');
+
+    //     } catch (\Exception $e) {
+    //         Log::error('DAY ATTENDANCE FAILED', [
+    //             'student_id' => $request->student_id,
+    //             'date' => $request->date,
+    //             'status' => $request->status,
+    //             'error' => $e->getMessage(),
+    //             'file' => $e->getFile(),
+    //             'line' => $e->getLine(),
+    //         ]);
+    //         DB::rollBack();
+
+    //         return back()->with('error', $e->getMessage());
+    //     }
+
+
+    // }
+
     public function update(Request $request)
-    {
-        Log::info('========== DAY ATTENDANCE UPDATE ==========', [
-            'user_id' => auth()->id(),
+{
+    Log::info('========== DAY ATTENDANCE UPDATE ==========', [
+        'user_id' => auth()->id(),
+        'student_id' => $request->student_id,
+        'date' => $request->date,
+        'status' => $request->status,
+    ]);
+
+    DB::beginTransaction();
+
+    try {
+
+        $attendance = Attendance::updateOrCreate(
+            [
+                'student_id' => $request->student_id,
+                'date' => $request->date,
+            ],
+            [
+                'status' => $request->status,
+            ]
+        );
+
+        Log::info('DAY ATTENDANCE SAVED', [
+            'attendance_id' => $attendance->id,
             'student_id' => $request->student_id,
             'date' => $request->date,
             'status' => $request->status,
+            'user_id' => auth()->id(),
         ]);
-        DB::beginTransaction();
 
-        try {
+        /*
+        |--------------------------------------------------------------------------
+        | ABSENT → SEND DLT ABSENCE SMS
+        |--------------------------------------------------------------------------
+        */
 
-            $attendance = Attendance::updateOrCreate(
-                [
+        if ($request->status === 'A') {
+
+            $student = Student::find($request->student_id);
+
+            if ($student && !empty($student->father_phone)) {
+
+                $date = \Carbon\Carbon::parse($request->date)
+                    ->format('d-m-Y');
+
+                /*
+                |--------------------------------------------------------------------------
+                | DLT APPROVED MESSAGE
+                |--------------------------------------------------------------------------
+                */
+
+                $message =
+                    "Dear Parent,\n" .
+                    "your ward Name:{$student->name} is absent on Date:{$date}\n" .
+                    "TSACBCON\n" .
+                    "Principal\n" .
+                    "IDEAL";
+
+                Log::info('DAY ABSENCE DLT SMS', [
+                    'student_id' => $student->id,
+                    'student_name' => $student->name,
+                    'phone' => $student->father_phone,
+                    'date' => $date,
+                    'template_id' => config('services.sms.te_id'),
+                ]);
+
+                $smsResult = SmsService::send(
+                    $student->father_phone,
+                    $message,
+                    config('services.sms.te_id')
+                );
+
+                Log::info('DAY ABSENCE SMS RESULT', [
+                    'student_id' => $student->id,
+                    'phone' => $student->father_phone,
+                    'result' => $smsResult,
+                ]);
+            } else {
+
+                Log::warning('DAY ABSENCE SMS NOT SENT - NO PHONE', [
                     'student_id' => $request->student_id,
-                    'date' => $request->date
-                ],
-                [
-                    'status' => $request->status
-                ]
-            );
-            Log::info('DAY ATTENDANCE SAVED', [
-                'attendance_id' => $attendance->id,
-                'student_id' => $request->student_id,
-                'date' => $request->date,
-                'status' => $request->status,
-                'user_id' => auth()->id(),
-            ]);
-            // If Absent → Generate OTP + Send SMS
-            if ($request->status === 'A') {
-
-                $student = Student::find($request->student_id);
-
-                if ($student && !empty($student->father_phone)) {
-
-                    $otp = rand(100000, 999999);
-
-                    // Save OTP
-                    $attendance->update([
-                        'otp' => $otp
-                    ]);
-
-                    //  message || ${otp} Please use this OTP ${otp} for your registration.IDLSMS,
-                    $message = "{$otp} Please use this OTP {$otp} for your registration.IDLSMS";
-                    // $message = "Please use this OTP {$otp} for absence confirmation. IDLSMS";
-
-                    SmsService::send($student->father_phone, $message);
-                }
+                ]);
             }
-
-            DB::commit();
-
-            return back()->with('success', 'Attendance Updated');
-
-        } catch (\Exception $e) {
-            Log::error('DAY ATTENDANCE FAILED', [
-                'student_id' => $request->student_id,
-                'date' => $request->date,
-                'status' => $request->status,
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ]);
-            DB::rollBack();
-
-            return back()->with('error', $e->getMessage());
         }
 
+        DB::commit();
 
+        return back()->with(
+            'success',
+            'Attendance Updated'
+        );
+
+    } catch (\Throwable $e) {
+
+        DB::rollBack();
+
+        Log::error('DAY ATTENDANCE FAILED', [
+            'student_id' => $request->student_id,
+            'date' => $request->date,
+            'status' => $request->status,
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ]);
+
+        return back()->with(
+            'error',
+            $e->getMessage()
+        );
     }
-
+}
     public function dayList(Request $request)
     {
         $date = $request->date ?? now()->toDateString();
